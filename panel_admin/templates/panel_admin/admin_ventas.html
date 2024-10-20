@@ -1,0 +1,183 @@
+{% extends 'panel_admin/admin_base.html' %}
+
+{% block titulo %}Admin - Ventas{% endblock %}
+
+{% block contenido %}
+
+<div class="container-fluid min-vh-100">  
+    <div class="row my-3">
+        <div class="col-9">
+            <div class="box h-100">
+                <h3 class="text-center py-2">Ventas en el último año</h3>
+                <div id="graficoLinealVentasAnio" class="h-100"></div>
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="box h-100 d-flex flex-column justify-content-center">
+                <h3 class="text-center my-2">Días con más ventas</h3>
+                
+                <div class="flex-grow-1 d-flex flex-column justify-content-center px-4">
+                    <div class="d-flex justify-content-between">
+                        <h4>Lunes</h4>
+                        <h4>100</h4>
+                    </div>
+                    <hr class="m-1">
+                    
+                    <div class="d-flex justify-content-between">
+                        <h4>Martes</h4>
+                        <h4>60</h4>
+                    </div>
+                    <hr class="m-1">
+                    
+                    <div class="d-flex justify-content-between">
+                        <h4>Miércoles</h4>
+                        <h4>50</h4>
+                    </div>
+                    <hr class="m-1">
+                    
+                    <div class="d-flex justify-content-between">
+                        <h4>Sábado</h4>
+                        <h4>40</h4>
+                    </div>
+                </div>
+            </div>            
+        </div>
+    </div>
+
+    <div class="row my-3">
+        <div class="col-3">
+            <div class="box h-100">
+                <h3 class="text-center py-2">Métodos de pago</h3>
+                <div id="graficoCircularPagos" class="h-100"></div>
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="box h-100 d-flex flex-column justify-content-center">
+                <h3 class="text-center my-2">Ingresos del mes</h3>
+                <div class="d-flex flex-grow-1 justify-content-center align-items-center">
+                    <p class="display-1" style="background: linear-gradient(45deg, #ff7e5f, #D03139); -webkit-background-clip: text; color: transparent; text-align: end;">S/.93<br>.30</p>
+                </div>
+            </div>
+            
+        </div>
+        
+        <div class="col-3">
+            <div class="box h-100 d-flex flex-column justify-content-center">
+                <h3 class="text-center my-2">Horas con más ventas</h3>
+                
+                <div class="flex-grow-1 d-flex flex-column justify-content-center px-4">
+                    <div class="d-flex justify-content-between">
+                        <h4>20:00</h4>
+                        <h4>100</h4>
+                    </div>
+                    <hr class="m-1">
+                    
+                    <div class="d-flex justify-content-between">
+                        <h4>19:00</h4>
+                        <h4>60</h4>
+                    </div>
+                    <hr class="m-1">
+                    
+                    <div class="d-flex justify-content-between">
+                        <h4>18:00</h4>
+                        <h4>50</h4>
+                    </div>
+                    <hr class="m-1">
+                    
+                    <div class="d-flex justify-content-between">
+                        <h4>17:00</h4>
+                        <h4>40</h4>
+                    </div>
+
+                    <hr class="m-1">
+
+                    <div class="d-flex justify-content-between">
+                        <h4>16:00</h4>
+                        <h4>30</h4>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="col-3">
+            <div class="box h-100 d-flex flex-column justify-content-center">
+                <h3 class="text-center my-2">Costo promedio de venta</h3>
+                <div class="d-flex flex-grow-1 justify-content-center align-items-center">
+                    <p class="display-1" style="background: linear-gradient(45deg, #ff7e5f, #D03139); -webkit-background-clip: text; color: transparent; text-align: end;">S/.93<br>.30</p>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    
+
+    
+
+</div>
+
+
+
+
+<script>
+    const chartData = {{ data|safe }};
+    const chartDataPagos = {{ data_pagos|safe }};
+    
+    // Gráfico Lineal de Ventas del Año
+    const graficoLinealVentasAnio = echarts.init(document.getElementById('graficoLinealVentasAnio'));
+    const optionLineal = {
+        tooltip: {},
+        xAxis: {
+            type: 'category',
+            data: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+        },
+        yAxis: {
+            type: 'value'
+        },
+        series: [{
+            name: 'Datos',
+            type: 'line',
+            data: chartData
+        }]
+    };
+    
+    graficoLinealVentasAnio.setOption(optionLineal);
+    window.addEventListener('resize', () => {
+        graficoLinealVentasAnio.resize();
+    });
+
+    // Gráfico Circular de Métodos de Pago
+    const graficoCircularPagos = echarts.init(document.getElementById('graficoCircularPagos'));
+    const optionCircular = {
+        tooltip: {
+            trigger: 'item'
+        },
+        series: [{
+            type: 'pie',
+            radius: '50%',
+            data: [
+                { value: chartDataPagos[0], name: 'Tarjeta' },
+                { value: chartDataPagos[1], name: 'Efectivo' }
+            ],
+            emphasis: {
+                itemStyle: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+            }
+        }],
+        color: ['#FFD40D', '#D03139']
+    };
+
+    graficoCircularPagos.setOption(optionCircular);
+    window.addEventListener('resize', () => {
+        graficoCircularPagos.resize();
+    });
+</script>
+
+
+
+
+{% endblock %}
