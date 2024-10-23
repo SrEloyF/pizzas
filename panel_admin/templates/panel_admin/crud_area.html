@@ -1,0 +1,14 @@
+{% extends 'panel_admin/admin_base.html' %}
+
+{% block titulo %}Admin - Areas CRUD{% endblock %}
+
+{% block contenido %}
+<!--boton añadir nuevo-->
+<!--tabla con filas y columna adicional de editar y eliminar-->
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Guardar</button>
+</form>
+
+{% endblock %}

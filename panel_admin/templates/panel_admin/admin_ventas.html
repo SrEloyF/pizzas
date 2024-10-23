@@ -4,117 +4,103 @@
 
 {% block contenido %}
 
-<div class="container-fluid min-vh-100">  
-    <div class="row my-3">
-        <div class="col-9">
-            <div class="box h-100">
-                <h3 class="text-center py-2">Ventas en el último año</h3>
-                <div id="graficoLinealVentasAnio" class="h-100"></div>
-            </div>
-        </div>
-        <div class="col-3">
-            <div class="box h-100 d-flex flex-column justify-content-center">
-                <h3 class="text-center my-2">Días con más ventas</h3>
-                
-                <div class="flex-grow-1 d-flex flex-column justify-content-center px-4">
-                    <div class="d-flex justify-content-between">
-                        <h4>Lunes</h4>
-                        <h4>100</h4>
-                    </div>
-                    <hr class="m-1">
-                    
-                    <div class="d-flex justify-content-between">
-                        <h4>Martes</h4>
-                        <h4>60</h4>
-                    </div>
-                    <hr class="m-1">
-                    
-                    <div class="d-flex justify-content-between">
-                        <h4>Miércoles</h4>
-                        <h4>50</h4>
-                    </div>
-                    <hr class="m-1">
-                    
-                    <div class="d-flex justify-content-between">
-                        <h4>Sábado</h4>
-                        <h4>40</h4>
-                    </div>
-                </div>
-            </div>            
+<div class="row h-50 my-3 mx-0">
+    <div class="col-9 h-100">
+        <div class="box h-100">
+            <h3 class="text-center py-3">Ventas en el último año</h3>
+            <div id="graficoLinealVentasAnio" class="h-75"></div>
         </div>
     </div>
 
-    <div class="row my-3">
-        <div class="col-3">
-            <div class="box h-100">
-                <h3 class="text-center py-2">Métodos de pago</h3>
-                <div id="graficoCircularPagos" class="h-100"></div>
-            </div>
-        </div>
-        <div class="col-3">
-            <div class="box h-100 d-flex flex-column justify-content-center">
-                <h3 class="text-center my-2">Ingresos del mes</h3>
-                <div class="d-flex flex-grow-1 justify-content-center align-items-center">
-                    <p class="display-1" style="background: linear-gradient(45deg, #ff7e5f, #D03139); -webkit-background-clip: text; color: transparent; text-align: end;">S/.93<br>.30</p>
-                </div>
-            </div>
+    <div class="col-3 h-100">
+        <div class="box h-100">
+            <h3 class="text-center py-3">Días con más ventas</h3>
             
-        </div>
-        
-        <div class="col-3">
-            <div class="box h-100 d-flex flex-column justify-content-center">
-                <h3 class="text-center my-2">Horas con más ventas</h3>
+            <div class="flex-grow-1 d-flex flex-column justify-content-center px-4">
+                <div class="d-flex justify-content-between">
+                    <h4>Lunes</h4>
+                    <h4>100</h4>
+                </div>
+                <hr class="m-1">
                 
-                <div class="flex-grow-1 d-flex flex-column justify-content-center px-4">
-                    <div class="d-flex justify-content-between">
-                        <h4>20:00</h4>
-                        <h4>100</h4>
-                    </div>
-                    <hr class="m-1">
-                    
-                    <div class="d-flex justify-content-between">
-                        <h4>19:00</h4>
-                        <h4>60</h4>
-                    </div>
-                    <hr class="m-1">
-                    
-                    <div class="d-flex justify-content-between">
-                        <h4>18:00</h4>
-                        <h4>50</h4>
-                    </div>
-                    <hr class="m-1">
-                    
-                    <div class="d-flex justify-content-between">
-                        <h4>17:00</h4>
-                        <h4>40</h4>
-                    </div>
-
-                    <hr class="m-1">
-
-                    <div class="d-flex justify-content-between">
-                        <h4>16:00</h4>
-                        <h4>30</h4>
-                    </div>
+                <div class="d-flex justify-content-between">
+                    <h4>Martes</h4>
+                    <h4>60</h4>
+                </div>
+                <hr class="m-1">
+                
+                <div class="d-flex justify-content-between">
+                    <h4>Miércoles</h4>
+                    <h4>50</h4>
+                </div>
+                <hr class="m-1">
+                
+                <div class="d-flex justify-content-between">
+                    <h4>Sábado</h4>
+                    <h4>40</h4>
                 </div>
             </div>
-            
+
         </div>
+    </div>
+</div>
 
-        <div class="col-3">
-            <div class="box h-100 d-flex flex-column justify-content-center">
-                <h3 class="text-center my-2">Costo promedio de venta</h3>
-                <div class="d-flex flex-grow-1 justify-content-center align-items-center">
-                    <p class="display-1" style="background: linear-gradient(45deg, #ff7e5f, #D03139); -webkit-background-clip: text; color: transparent; text-align: end;">S/.93<br>.30</p>
-                </div>
-            </div>
-            
+<div class="row h-50 my-2 mx-0">
+    <div class="col-3 h-100">
+        <div class="box h-100">
+            <h3 class="text-center py-3">Métodos de pago</h3>
+            <div id="graficoCircularPagos" class="h-75"></div>
         </div>
     </div>
 
-    
+    <div class="col-3 h-100">
+        <div class="box h-100">
+            <h3 class="text-center py-3">Ingresos del mes</h3>
+            <div class="d-flex flex-grow-1 justify-content-center align-items-center">
+                <p class="display-1" style="background: linear-gradient(45deg, #ff7e5f, #D03139); -webkit-background-clip: text; color: transparent; text-align: end;">S/.93<br>.30</p>
+            </div>
+        </div>
+    </div>
 
-    
+    <div class="col-3 h-100">
+        <div class="box h-100">
+            <h3 class="text-center py-3">Horas con más ventas</h3>
+            
+            <div class="flex-grow-1 d-flex flex-column justify-content-center px-4">
+                <div class="d-flex justify-content-between">
+                    <h4>20:00</h4>
+                    <h4>100</h4>
+                </div>
+                <hr class="m-1">
+                
+                <div class="d-flex justify-content-between">
+                    <h4>19:00</h4>
+                    <h4>60</h4>
+                </div>
+                <hr class="m-1">
+                
+                <div class="d-flex justify-content-between">
+                    <h4>18:00</h4>
+                    <h4>50</h4>
+                </div>
+                <hr class="m-1">
+                
+                <div class="d-flex justify-content-between">
+                    <h4>17:00</h4>
+                    <h4>40</h4>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <div class="col-3 h-100">
+        <div class="box h-100">
+            <h3 class="text-center py-3">Costo promedio de venta</h3>
+            <div class="d-flex flex-grow-1 justify-content-center align-items-center">
+                <p class="display-1" style="background: linear-gradient(45deg, #ff7e5f, #D03139); -webkit-background-clip: text; color: transparent; text-align: end;">S/.93<br>.30</p>
+            </div>
+        </div>
+    </div>
 </div>
 
 
@@ -128,6 +114,7 @@
     const graficoLinealVentasAnio = echarts.init(document.getElementById('graficoLinealVentasAnio'));
     const optionLineal = {
         tooltip: {},
+        
         xAxis: {
             type: 'category',
             data: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']

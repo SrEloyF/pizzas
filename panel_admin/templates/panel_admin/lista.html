@@ -1,0 +1,134 @@
+{% extends 'panel_admin/admin_base.html' %}
+
+{% load filters %}
+
+{% block titulo %}Listado{% endblock %}
+
+{% block contenido %}
+    <div class="m-3">
+
+    {% if model_name == 'productosventa' %}
+        <h2>Listado de Productos Venta</h2>
+    {% elif model_name == 'productosprima' %}
+        <h2>Listado de Productos Prima</h2>
+    {% else %}
+        <h2>Listado de {{ model_name|capfirst }}</h2>
+    {% endif %}
+
+    <div class="mb-3">
+        <a href="{% url 'crear_objeto' model_name=model_name|lower %}" class="btn btn-success">
+            <i class="bi bi-plus-circle-fill me-2"></i>
+            Añadir {{ model_name }}
+        </a>
+    </div>
+
+    {% if objetos|length > 0 %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        {% for campo in campos %}
+                        <th>{{ campo|capfirst }}</th>
+                        {% endfor %}
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for objeto in objetos %}
+                    <tr>
+                        {% for campo in campos %}
+                        <td>
+                            {% if campo == 'imagen' and objeto.imagen %}
+                                <img src="{{ objeto.imagen.url }}" alt="{{ objeto.nombre }}" style="height: 35px;">
+                            {% else %}
+                                {{ objeto|getattribute:campo }}
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                        <td>
+                            <a href="{% url 'editar_objeto' model_name=model_name|lower pk=objeto.pk %}" class="btn btn-sm btn-warning">
+                                <i class="bi bi-pencil-square me-2"></i>
+                                Editar
+                            </a>
+                            <form action="{% url 'eliminar_objeto' model_name=model_name|lower pk=objeto.pk %}" method="post" style="display:inline;" id="form-eliminar-{{ objeto.pk }}">
+                                {% csrf_token %}
+                                <button type="button" class="btn btn-sm btn-danger" onclick="confirmarEliminacion({{ objeto.pk }})">
+                                    <i class="bi bi-trash3 me-2"></i>
+                                    Eliminar
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if objetos.has_other_pages %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if objetos.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1">Primera</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ objetos.previous_page_number }}">Anterior</a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in objetos.paginator.page_range %}
+                        {% if objetos.number == num %}
+                            <li class="page-item active" aria-current="page">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if objetos.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ objetos.next_page_number }}">Siguiente</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ objetos.paginator.num_pages }}">Última</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+        
+    {% else %}
+        <p>No hay registros</p>
+    {% endif %}
+    
+    </div>
+    <script>
+    function confirmarEliminacion(objetoId) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¡No podrás recuperar este registro!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminarlo',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('form-eliminar-' + objetoId).submit();
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        {% if messages %}
+            {% for message in messages %}
+                toastr.{{ message.tags }}("{{ message }}");
+            {% endfor %}
+        {% endif %}
+    });
+    </script>
+{% endblock %}
