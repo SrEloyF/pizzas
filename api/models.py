@@ -54,10 +54,10 @@ class Categoria(models.Model):
         return self.nombre
 
 class Cliente(models.Model):
-    nombre = models.CharField(max_length=45)
-    apellido = models.CharField(max_length=45)
+    usuario = models.CharField(max_length=45)
     correo = models.EmailField(max_length=50)
     telefono = models.IntegerField()
+    contrasena = models.CharField(max_length=80)
 
     def __str__(self):
         return f"{self.nombre} {self.apellido}"
@@ -81,13 +81,14 @@ class Pago(models.Model):
 
 class Pedido(models.Model):
     sucursal = models.ForeignKey(Sucursal, on_delete=models.PROTECT)
-    pago = models.ForeignKey(Pago, on_delete=models.PROTECT)
+    #pago = models.ForeignKey(Pago, on_delete=models.PROTECT)
     cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
     fecha_pedido = models.DateTimeField(auto_now_add=True)
     fecha_entrega = models.DateField()
-    direccion = models.CharField(max_length=45)
     estado = models.CharField(max_length=45)
     nombre_ref = models.CharField(max_length=45)
+    correo = models.CharField(max_length=85)
+    direccion = models.CharField(max_length=85)
 
     def __str__(self):
         return f"Pedido {self.pk} - {self.estado}"
@@ -128,11 +129,17 @@ class Paquete(models.Model):
         return f"Paquete {self.pk}"
 
 class Empleado(models.Model):
+    ESTADO_CHOICES = [
+        ('disponible', 'Disponible'),
+        ('no_disponible', 'No Disponible'),
+    ]
+
     sucursal = models.ForeignKey(Sucursal, on_delete=models.PROTECT)
     area = models.ForeignKey(Area, on_delete=models.PROTECT)
     nombre = models.CharField(max_length=45)
     apellido = models.CharField(max_length=45)
     cargo = models.CharField(max_length=45)
+    estado = models.CharField(max_length=15, choices=ESTADO_CHOICES, default='disponible')
 
     def __str__(self):
         return f"{self.nombre} {self.apellido}"
@@ -140,7 +147,7 @@ class Empleado(models.Model):
 class Historial(models.Model):
     empleado = models.ForeignKey(Empleado, on_delete=models.PROTECT)
     pedido = models.ForeignKey(Pedido, on_delete=models.PROTECT)
-    estado = models.CharField(max_length=45)
+    detalle = models.CharField(max_length=45)
     fecha = models.DateField()
 
     def __str__(self):

@@ -29,7 +29,7 @@ class SucursalForm(BaseForm):
 class EmpleadoForm(BaseForm):
     class Meta:
         model = Empleado
-        fields = ['sucursal', 'area', 'nombre', 'apellido', 'cargo']
+        fields = ['sucursal', 'area', 'nombre', 'apellido', 'cargo', 'estado']
 
 class ProductoVentaForm(BaseForm):
     class Meta:
