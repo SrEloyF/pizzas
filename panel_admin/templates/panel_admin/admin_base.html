@@ -105,7 +105,7 @@
                             <a href="#" class="sidebar-link">Info Productos Prima</a>
                         </li>
                         <li class="sidebar-item">
-                            <a href="{% url 'productos_prima_lista' %}" class="sidebar-link">Crud Productos Prima</a>
+                            <a href="{% url 'productosprima_lista' %}" class="sidebar-link">Crud Productos Prima</a>
                         </li>
                     </ul>
                 </li>
@@ -121,7 +121,7 @@
                             <a href="#" class="sidebar-link">Info Productos Venta</a>
                         </li>
                         <li class="sidebar-item">
-                            <a href="{% url 'productos_venta_lista' %}" class="sidebar-link">Crud Productos Venta</a>
+                            <a href="{% url 'productosventa_lista' %}" class="sidebar-link">Crud Productos Venta</a>
                         </li>
                     </ul>
                 </li>
@@ -150,14 +150,35 @@
                     </a>
                 </li>
 
-
+                
                 <li class="sidebar-item">
-                    <a href="#" class="sidebar-link" data-tooltip="Cerrar">
-                        <i class="bi bi-box-arrow-left"></i>
-                    <span>Cerrar sesión</span>
+                    <a href="{% url 'usuarioadmins_lista' %}" class="sidebar-link" data-tooltip="Admins">
+                        <i class="fa-solid fa-user-tie"></i>
+                    <span>Agregar Admin</span>
                     </a>
                 </li>
 
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link" data-tooltip="Cerrar" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        <i class="bi bi-box-arrow-left"></i>
+                        <span>Cerrar sesión</span>
+                    </a>
+                    <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">
+                        {% csrf_token %}
+                    </form>
+                </li>
+
+                <!--
+                <li class="sidebar-item">
+                    <form action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="sidebar-link" data-tooltip="Cerrar">
+                            <i class="bi bi-box-arrow-left"></i>
+                            <span>Cerrar sesión</span>
+                        </button>
+                    </form>
+                </li>
+                -->
 
             </ul>
         </aside>

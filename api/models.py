@@ -1,4 +1,43 @@
 from django.db import models
+from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+
+class UsuarioAdminManager(BaseUserManager):
+    def create_user(self, usuario, password=None, **extra_fields):
+        if not usuario:
+            raise ValueError('El usuario debe tener un nombre de usuario')
+        user = self.model(usuario=usuario, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, usuario, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superusuario debe tener is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superusuario debe tener is_superuser=True.')
+
+        return self.create_user(usuario, password, **extra_fields)
+
+    def get_by_natural_key(self, usuario):
+        return self.get(usuario=usuario)
+
+class UsuarioAdmin(AbstractBaseUser, PermissionsMixin):
+    ROL_CHOICES = [
+        ('general', 'General'),
+        ('otro', 'Otro'),
+    ]
+
+    usuario = models.CharField(max_length=50, unique=True)
+    rol = models.CharField(max_length=10, choices=ROL_CHOICES)
+
+    USERNAME_FIELD = 'usuario'
+    REQUIRED_FIELDS = []
+
+    objects = UsuarioAdminManager()
 
 class Area(models.Model):
     nombre_area = models.CharField(max_length=45)

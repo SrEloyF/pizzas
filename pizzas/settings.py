@@ -30,6 +30,13 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+AUTH_USER_MODEL = 'api.UsuarioAdmin'
+LOGOUT_REDIRECT_URL = '/panel_admin/login/'
+
+
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -88,6 +95,11 @@ DATABASES = {
         'PORT': '3306',
     }
 }
+
+AUTHENTICATION_BACKENDS = [
+    'panel_admin.backends.UsuarioAdminBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 
 

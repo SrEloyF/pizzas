@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from api.models import *
 from panel_admin.forms import *
 import json
@@ -10,7 +11,11 @@ from .forms import *
 from django.http import Http404
 from django.contrib import messages
 from django.db import IntegrityError
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login
 
+
+@login_required(login_url='/panel_admin/login/')
 def vista_admin_ventas(request):
     data = [10, 20, 30, 40, 50, 10, 20, 30, 40, 50, 23, 33]
     data_pagos = [140, 235]
@@ -19,20 +24,52 @@ def vista_admin_ventas(request):
         'data_pagos': json.dumps(data_pagos),
     })
 
+@login_required(login_url='/panel_admin/login/')
 def vista_admin_empleados(request):
     return render(request, 'panel_admin/admin_empleados.html')
 
+@login_required(login_url='/panel_admin/login/')
 def vista_admin_plantilla(request):
     return render(request, 'panel_admin/admin_base.html')
 
+@login_required(login_url='/panel_admin/login/')
 def vista_admin_sucursales(request):
     return render(request, 'panel_admin/admin_sucursales.html')
 
+@login_required(login_url='/panel_admin/login/')
 def vista_admin_clientes(request):
     return render(request, 'panel_admin/admin_clientes.html')
 
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST['usuario']
+        password = request.POST['contrasena']
 
-class AreaListView(ListView):
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            next_url = request.GET.get('next', 'admin_ventas')
+            return redirect(next_url)
+        else:
+            messages.error(request, 'Usuario o contraseña incorrectos.')
+
+    return render(request, 'panel_admin/login.html')
+
+class UsuarioAdminListView(LoginRequiredMixin, ListView):
+    login_url = '/panel_admin/login/'
+    model = UsuarioAdmin
+    template_name = 'panel_admin/lista.html'
+    context_object_name = 'objetos'
+    paginate_by = 8
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['campos'] = ['id', 'usuario', 'rol']
+        context['model_name'] = "UsuarioAdmins"
+        return context
+
+class AreaListView(LoginRequiredMixin, ListView):
+    login_url = '/panel_admin/login/'
     model = Area
     template_name = 'panel_admin/lista.html'
     context_object_name = 'objetos'
@@ -44,7 +81,8 @@ class AreaListView(ListView):
         context['model_name'] = "Areas"
         return context
 
-class CategoriaListView(ListView):
+class CategoriaListView(LoginRequiredMixin, ListView):
+    login_url = '/panel_admin/login/'
     model = Categoria
     template_name = 'panel_admin/lista.html'
     context_object_name = 'objetos'
@@ -56,7 +94,8 @@ class CategoriaListView(ListView):
         context['model_name'] = "Categorias"
         return context
 
-class SucursalListView(ListView):
+class SucursalListView(LoginRequiredMixin, ListView):
+    login_url = '/panel_admin/login/'
     model = Sucursal
     template_name = 'panel_admin/lista.html'
     context_object_name = 'objetos'
@@ -68,7 +107,8 @@ class SucursalListView(ListView):
         context['model_name'] = "Sucursales"
         return context
 
-class EmpleadoListView(ListView):
+class EmpleadoListView(LoginRequiredMixin, ListView):
+    login_url = '/panel_admin/login/'
     model = Empleado
     template_name = 'panel_admin/lista.html'
     context_object_name = 'objetos'
@@ -80,7 +120,8 @@ class EmpleadoListView(ListView):
         context['model_name'] = "Empleados"
         return context
 
-class ProductoVentaListView(ListView):
+class ProductoVentaListView(LoginRequiredMixin, ListView):
+    login_url = '/panel_admin/login/'
     model = ProductoVenta
     template_name = 'panel_admin/lista.html'
     context_object_name = 'objetos'
@@ -92,7 +133,8 @@ class ProductoVentaListView(ListView):
         context['model_name'] = "ProductosVenta"
         return context
 
-class ProductoPrimaListView(ListView):
+class ProductoPrimaListView(LoginRequiredMixin, ListView):
+    login_url = '/panel_admin/login/'
     model = ProductoPrima
     template_name = 'panel_admin/lista.html'
     context_object_name = 'objetos'
@@ -104,7 +146,8 @@ class ProductoPrimaListView(ListView):
         context['model_name'] = "ProductosPrima"
         return context
 
-class PaqueteListView(ListView):
+class PaqueteListView(LoginRequiredMixin, ListView):
+    login_url = '/panel_admin/login/'
     model = Paquete
     template_name = 'panel_admin/lista.html'
     context_object_name = 'objetos'
@@ -116,83 +159,40 @@ class PaqueteListView(ListView):
         context['model_name'] = "Paquetes"
         return context
 
+################################
+class ModelFactory:
+    models_forms = {
+        'areas': (Area, AreaForm),
+        'categorias': (Categoria, CategoriaForm),
+        'sucursales': (Sucursal, SucursalForm),
+        'empleados': (Empleado, EmpleadoForm),
+        'productosventa': (ProductoVenta, ProductoVentaForm),
+        'productosprima': (ProductoPrima, ProductoPrimaForm),
+        'paquetes': (Paquete, PaqueteForm),
+        'usuarioadmins': (UsuarioAdmin, UsuarioAdminForm)
+        #'superusuarios': (SuperUsuario, SuperUsuarioForm)
+    }
 
-class CrearObjetoView(CreateView):
+    @classmethod
+    def get_model_and_form(cls, model_name):
+        return cls.models_forms.get(model_name)
+
+class BaseObjetoView:
     template_name = 'panel_admin/aniadir_editar.html'
 
     def get_model(self):
         model_name = self.kwargs['model_name']
-
-        if model_name == 'areas':
-            return Area, AreaForm
-        elif model_name == 'categorias':
-            return Categoria, CategoriaForm
-        elif model_name == 'sucursales':
-            return Sucursal, SucursalForm
-        elif model_name == 'empleados':
-            return Empleado, EmpleadoForm
-        elif model_name == 'productosventa':
-            return ProductoVenta, ProductoVentaForm
-        elif model_name == 'productosprima':
-            return ProductoPrima, ProductoPrimaForm
-        elif model_name == 'paquetes':
-            return Paquete, PaqueteForm
+        model_and_form = ModelFactory.get_model_and_form(model_name)
+        if not model_and_form:
+            raise Http404(f"Modelo {model_name} no encontrado.")
+        return model_and_form
 
     def get_form_class(self):
-        model, form_class = self.get_model()
+        _, form_class = self.get_model()
         return form_class
 
     def get_success_url(self):
         model_name = self.kwargs["model_name"]
-        if model_name == 'productosventa':
-            return reverse_lazy('productos_venta_lista')
-        elif model_name == 'productosprima':
-            return reverse_lazy('productos_prima_lista')
-        return reverse_lazy(f'{model_name}_lista') 
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['model_name'] = self.kwargs['model_name']
-        return context
-
-class EditarObjetoView(UpdateView):
-    template_name = 'panel_admin/aniadir_editar.html'
-
-    def get_model(self):
-        model_name = self.kwargs['model_name']
-
-        if model_name == 'productosprima':
-            model_name = 'productos_prima'
-
-        if model_name == 'areas':
-            return Area, AreaForm
-        elif model_name == 'categorias':
-            return Categoria, CategoriaForm
-        elif model_name == 'sucursales':
-            return Sucursal, SucursalForm
-        elif model_name == 'empleados':
-            return Empleado, EmpleadoForm
-        elif model_name == 'productosventa':
-            return ProductoVenta, ProductoVentaForm
-        elif model_name == 'productos_prima':
-            return ProductoPrima, ProductoPrimaForm
-        elif model_name == 'paquetes':
-            return Paquete, PaqueteForm
-
-    def get_form_class(self):
-        model, form_class = self.get_model()
-        return form_class
-
-    def get_object(self):
-        model, _ = self.get_model()
-        return get_object_or_404(model, pk=self.kwargs['pk'])
-
-    def get_success_url(self):
-        model_name = self.kwargs["model_name"]
-        if model_name == 'productosventa':
-            return reverse_lazy('productos_venta_lista')
-        elif model_name == 'productosprima':
-            return reverse_lazy('productos_prima_lista')
         return reverse_lazy(f'{model_name}_lista')
 
     def get_context_data(self, **kwargs):
@@ -200,30 +200,20 @@ class EditarObjetoView(UpdateView):
         context['model_name'] = self.kwargs['model_name']
         return context
 
-class EliminarObjetoView(DeleteView):
-    template_name = ''
-    success_url = reverse_lazy('categorias_lista')
+class CrearObjetoView(BaseObjetoView, CreateView):
+    pass
 
-    def get_model(self):
-        model_name = self.kwargs['model_name']
+class EditarObjetoView(BaseObjetoView, UpdateView):
+    def get_object(self):
+        model, _ = self.get_model()
+        return get_object_or_404(model, pk=self.kwargs['pk'])
 
-        if model_name == 'areas':
-            return Area
-        elif model_name == 'categorias':
-            return Categoria
-        elif model_name == 'sucursales':
-            return Sucursal
-        elif model_name == 'empleados':
-            return Empleado
-        elif model_name == 'productosventa':
-            return ProductoVenta
-        elif model_name == 'productosprima':
-            return ProductoPrima
-        elif model_name == 'paquetes':
-            return Paquete
+
+class EliminarObjetoView(BaseObjetoView, DeleteView):
+    template_name = '' 
 
     def get_object(self):
-        model = self.get_model()
+        model, _ = self.get_model()
         return get_object_or_404(model, pk=self.kwargs['pk'])
 
     def post(self, request, *args, **kwargs):
@@ -234,11 +224,3 @@ class EliminarObjetoView(DeleteView):
         except IntegrityError:
             messages.error(request, 'No se puede eliminar el registro porque está relacionado.')
         return redirect(self.get_success_url())
-
-    def get_success_url(self):
-        model_name = self.kwargs["model_name"]
-        if model_name == 'productosventa':
-            return reverse_lazy('productos_venta_lista')
-        elif model_name == 'productosprima':
-            return reverse_lazy('productos_prima_lista')
-        return reverse_lazy(f'{model_name}_lista')

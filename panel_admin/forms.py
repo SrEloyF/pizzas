@@ -57,3 +57,24 @@ class PaqueteForm(BaseForm):
     class Meta:
         model = Paquete
         fields = ['proventa', 'proprima']
+
+class UsuarioAdminForm(BaseForm):
+    class Meta:
+        model = UsuarioAdmin
+        fields = ['usuario', 'rol', 'password']
+
+"""
+class SuperUsuarioForm(forms.ModelForm):
+    contrasena = forms.CharField(widget=forms.PasswordInput, label="Contraseña")
+
+    class Meta:
+        model = SuperUsuario
+        fields = ['usuario', 'contrasena', 'rol']
+
+    def save(self, commit=True):
+        usuario = super().save(commit=False)
+        usuario.set_password(self.cleaned_data['contrasena'])
+        if commit:
+            usuario.save()
+        return usuario
+"""
