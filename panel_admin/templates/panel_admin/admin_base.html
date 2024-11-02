@@ -47,7 +47,7 @@
                 </li>
 
                 <li class="sidebar-item">
-                    <a href="#" class="sidebar-link collapsed has-dropdown {% if request.path == '/panel_admin/empleados_lista/' %}active{% endif %}" data-bs-toggle="collapse"
+                    <a href="#" class="sidebar-link collapsed has-dropdown {% if 'empleados' in request.path %}active{% endif %}" data-bs-toggle="collapse"
                         data-bs-target="#empleados" aria-expanded="false" aria-controls="empleados" data-tooltip="Empleados">
                         <i class="fa-solid fa-clipboard-user"></i>
                         <span>Empleados</span>

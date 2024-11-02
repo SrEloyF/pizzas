@@ -14,15 +14,72 @@ from django.db import IntegrityError
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 
+from django.utils import timezone
+from datetime import timedelta
+from django.db.models.functions import TruncMonth, TruncDay, TruncHour
+from django.db.models import Count, Sum, Avg
+import locale
 
 @login_required(login_url='/panel_admin/login/')
 def vista_admin_ventas(request):
-    data = [10, 20, 30, 40, 50, 10, 20, 30, 40, 50, 23, 33]
-    data_pagos = [140, 235]
+    #ultimos 12 meses
+    hoy = timezone.now()
+    locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
+    hace_12_meses = hoy - timedelta(days=365)
+    ventas_mensuales = (
+        Pedido.objects
+        .filter(fecha_pedido__gte=hace_12_meses)
+        .annotate(mes=TruncMonth('fecha_pedido'))
+        .values('mes')
+        .annotate(total_ventas=Count('id'))
+        .order_by('mes')
+    )
+    meses = [(hoy - timedelta(days=30 * i)).strftime("%B %Y") for i in range(11, -1, -1)]
+    data_ventas = []
+    for mes in meses:
+        total = next((venta['total_ventas'] for venta in ventas_mensuales if venta['mes'].strftime("%B %Y") == mes), 0)
+        data_ventas.append(total)
+
+    #metodos pagos
+    metodos_pago = Pago.objects.values('metodo_pago').annotate(cantidad=Count('id'))
+    data_pagos = [{pago['metodo_pago']: pago['cantidad']} for pago in metodos_pago]
+
+    #top dias
+    top_dias = Pedido.objects \
+        .annotate(dia=TruncDay('fecha_pedido')) \
+        .values('dia') \
+        .annotate(total_ventas=Count('id')) \
+        .order_by('-total_ventas')[:4]
+
+    top_dias_data = [{"dia": dia['dia'].strftime('%A'), "total_ventas": dia['total_ventas']} for dia in top_dias]
+
+    # Horas con más ventas (Top 4) 
+    top_horas = Pedido.objects \
+        .annotate(hora=TruncHour('fecha_pedido')) \
+        .values('hora') \
+        .annotate(total_ventas=Count('id')) \
+        .order_by('-total_ventas')[:4]
+
+    top_horas_data = [{"hora": hora['hora'].strftime('%H:%M'), "total_ventas": hora['total_ventas']} for hora in top_horas]
+
+    # Ingresos del mes actual
+    inicio_mes = timezone.now().replace(day=1)
+    fin_mes = inicio_mes + timedelta(days=31)
+    ingresos_mes = Pago.objects.filter(pedido__fecha_pedido__range=(inicio_mes, fin_mes)).aggregate(Sum('monto'))['monto__sum'] or 0
+
+    # Costo promedio de venta
+    costo_promedio_venta = Pago.objects.aggregate(Avg('monto'))['monto__avg'] or 0
+
     return render(request, 'panel_admin/admin_ventas.html', {
-        'data': json.dumps(data),
+        'data_ventas': json.dumps(data_ventas),
         'data_pagos': json.dumps(data_pagos),
+        'meses': json.dumps(meses),
+        'top_dias_data': top_dias_data,
+        'top_horas_data': top_horas_data,
+        'ingresos_mes': ingresos_mes,
+        'costo_promedio_venta': costo_promedio_venta,
     })
+
 
 @login_required(login_url='/panel_admin/login/')
 def vista_admin_empleados(request):
@@ -116,7 +173,7 @@ class EmpleadoListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['campos'] = ['id', 'sucursal', 'area', 'nombre', 'apellido', 'cargo']
+        context['campos'] = ['id', 'sucursal', 'area', 'nombre', 'apellido', 'cargo', 'estado']
         context['model_name'] = "Empleados"
         return context
 
@@ -170,7 +227,6 @@ class ModelFactory:
         'productosprima': (ProductoPrima, ProductoPrimaForm),
         'paquetes': (Paquete, PaqueteForm),
         'usuarioadmins': (UsuarioAdmin, UsuarioAdminForm)
-        #'superusuarios': (SuperUsuario, SuperUsuarioForm)
     }
 
     @classmethod

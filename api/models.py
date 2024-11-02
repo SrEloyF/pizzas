@@ -6,6 +6,7 @@ class UsuarioAdminManager(BaseUserManager):
     def create_user(self, usuario, password=None, **extra_fields):
         if not usuario:
             raise ValueError('El usuario debe tener un nombre de usuario')
+        extra_fields.setdefault('is_active', True)
         user = self.model(usuario=usuario, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -33,11 +34,21 @@ class UsuarioAdmin(AbstractBaseUser, PermissionsMixin):
 
     usuario = models.CharField(max_length=50, unique=True)
     rol = models.CharField(max_length=10, choices=ROL_CHOICES)
+    is_staff = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
 
     USERNAME_FIELD = 'usuario'
     REQUIRED_FIELDS = []
 
     objects = UsuarioAdminManager()
+
+    def __str__(self):
+        return self.usuario
+    def has_perm(self, perm, obj=None):
+        return True
+
+    def has_module_perms(self, app_label):
+        return True
 
 class Area(models.Model):
     nombre_area = models.CharField(max_length=45)
@@ -54,10 +65,10 @@ class Categoria(models.Model):
         return self.nombre
 
 class Cliente(models.Model):
-    nombre = models.CharField(max_length=45)
-    apellido = models.CharField(max_length=45)
+    usuario = models.CharField(max_length=45)
     correo = models.EmailField(max_length=50)
     telefono = models.IntegerField()
+    contrasena = models.CharField(max_length=80)
 
     def __str__(self):
         return f"{self.nombre} {self.apellido}"
@@ -71,26 +82,27 @@ class Sucursal(models.Model):
     def __str__(self):
         return self.direccion
 
+class Pedido(models.Model):
+    sucursal = models.ForeignKey(Sucursal, on_delete=models.PROTECT)
+    cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
+    fecha_pedido = models.DateTimeField(auto_now_add=True)
+    fecha_entrega = models.DateField()
+    estado = models.CharField(max_length=45)
+    nombre_ref = models.CharField(max_length=45)
+    correo = models.CharField(max_length=85)
+    direccion = models.CharField(max_length=85)
+
+    def __str__(self):
+        return f"Pedido {self.pk} - {self.estado}"
+
 class Pago(models.Model):
+    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
     monto = models.DecimalField(max_digits=10, decimal_places=2)
     metodo_pago = models.CharField(max_length=45)
     estado = models.CharField(max_length=45)
 
     def __str__(self):
         return f"Pago {self.pk} - {self.estado}"
-
-class Pedido(models.Model):
-    sucursal = models.ForeignKey(Sucursal, on_delete=models.PROTECT)
-    pago = models.ForeignKey(Pago, on_delete=models.PROTECT)
-    cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
-    fecha_pedido = models.DateTimeField(auto_now_add=True)
-    fecha_entrega = models.DateField()
-    direccion = models.CharField(max_length=45)
-    estado = models.CharField(max_length=45)
-    nombre_ref = models.CharField(max_length=45)
-
-    def __str__(self):
-        return f"Pedido {self.pk} - {self.estado}"
 
 class ProductoVenta(models.Model):
     nombre = models.CharField(max_length=70)
@@ -128,11 +140,17 @@ class Paquete(models.Model):
         return f"Paquete {self.pk}"
 
 class Empleado(models.Model):
+    ESTADO_CHOICES = [
+        ('disponible', 'Disponible'),
+        ('no_disponible', 'No Disponible'),
+    ]
+
     sucursal = models.ForeignKey(Sucursal, on_delete=models.PROTECT)
     area = models.ForeignKey(Area, on_delete=models.PROTECT)
     nombre = models.CharField(max_length=45)
     apellido = models.CharField(max_length=45)
     cargo = models.CharField(max_length=45)
+    estado = models.CharField(max_length=15, choices=ESTADO_CHOICES, default='disponible')
 
     def __str__(self):
         return f"{self.nombre} {self.apellido}"
@@ -140,7 +158,7 @@ class Empleado(models.Model):
 class Historial(models.Model):
     empleado = models.ForeignKey(Empleado, on_delete=models.PROTECT)
     pedido = models.ForeignKey(Pedido, on_delete=models.PROTECT)
-    estado = models.CharField(max_length=45)
+    detalle = models.CharField(max_length=45)
     fecha = models.DateField()
 
     def __str__(self):

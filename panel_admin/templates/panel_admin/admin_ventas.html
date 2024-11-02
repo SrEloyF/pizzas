@@ -4,6 +4,9 @@
 
 {% block contenido %}
 
+<style>
+</style>
+
 <div class="row h-50 my-3 mx-0">
     <div class="col-9 h-100">
         <div class="box h-100">
@@ -17,34 +20,23 @@
             <h3 class="text-center py-3">Días con más ventas</h3>
             
             <div class="flex-grow-1 d-flex flex-column justify-content-center px-4">
-                <div class="d-flex justify-content-between">
-                    <h4>Lunes</h4>
-                    <h4>100</h4>
-                </div>
-                <hr class="m-1">
-                
-                <div class="d-flex justify-content-between">
-                    <h4>Martes</h4>
-                    <h4>60</h4>
-                </div>
-                <hr class="m-1">
-                
-                <div class="d-flex justify-content-between">
-                    <h4>Miércoles</h4>
-                    <h4>50</h4>
-                </div>
-                <hr class="m-1">
-                
-                <div class="d-flex justify-content-between">
-                    <h4>Sábado</h4>
-                    <h4>40</h4>
-                </div>
+                {% if top_dias_data %}
+                    {% for dia in top_dias_data %}
+                        <div class="d-flex justify-content-between">
+                            <h4>{{ dia.dia }}</h4>
+                            <h4>{{ dia.total_ventas }}</h4>
+                        </div>
+                        <hr class="m-1">
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center">
+                        <h4>Sin datos</h4>
+                    </div>
+                {% endif %}
             </div>
-
         </div>
     </div>
 </div>
-
 <div class="row h-50 my-2 mx-0">
     <div class="col-3 h-100">
         <div class="box h-100">
@@ -56,68 +48,62 @@
     <div class="col-3 h-100">
         <div class="box h-100">
             <h3 class="text-center py-3">Ingresos del mes</h3>
-            <div class="d-flex flex-grow-1 justify-content-center align-items-center">
-                <p class="display-1" style="background: linear-gradient(45deg, #ff7e5f, #D03139); -webkit-background-clip: text; color: transparent; text-align: end;">S/.93<br>.30</p>
+            <div class="d-flex justify-content-center align-items-center" style="height: 60%;">
+                <p class="display-3" style="background: linear-gradient(45deg, #ff7e5f, #D03139); -webkit-background-clip: text; color: transparent; text-align: end;">S/.{{ ingresos_mes }}<br>.00</p>
             </div>
         </div>
     </div>
 
     <div class="col-3 h-100">
-        <div class="box h-100">
-            <h3 class="text-center py-3">Horas con más ventas</h3>
-            
-            <div class="flex-grow-1 d-flex flex-column justify-content-center px-4">
-                <div class="d-flex justify-content-between">
-                    <h4>20:00</h4>
-                    <h4>100</h4>
+    <div class="box h-100">
+        <h3 class="text-center py-3">Horas con más ventas</h3>
+        
+        <div class="flex-grow-1 d-flex flex-column justify-content-center px-4">
+            {% if top_horas_data %}
+                {% for hora in top_horas_data %}
+                    <div class="d-flex justify-content-between">
+                        <h4>{{ hora.hora }}</h4>
+                        <h4>{{ hora.total_ventas }}</h4>
+                    </div>
+                    <hr class="m-1">
+                {% endfor %}
+            {% else %}
+                <div class="text-center">
+                    <h4>Sin datos</h4>
                 </div>
-                <hr class="m-1">
-                
-                <div class="d-flex justify-content-between">
-                    <h4>19:00</h4>
-                    <h4>60</h4>
-                </div>
-                <hr class="m-1">
-                
-                <div class="d-flex justify-content-between">
-                    <h4>18:00</h4>
-                    <h4>50</h4>
-                </div>
-                <hr class="m-1">
-                
-                <div class="d-flex justify-content-between">
-                    <h4>17:00</h4>
-                    <h4>40</h4>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-3 h-100">
-        <div class="box h-100">
-            <h3 class="text-center py-3">Costo promedio de venta</h3>
-            <div class="d-flex flex-grow-1 justify-content-center align-items-center">
-                <p class="display-1" style="background: linear-gradient(45deg, #ff7e5f, #D03139); -webkit-background-clip: text; color: transparent; text-align: end;">S/.93<br>.30</p>
-            </div>
+            {% endif %}
         </div>
     </div>
 </div>
 
 
+    <div class="col-3 h-100">
+        <div class="box h-100">
+            <h3 class="text-center py-3">Costo promedio de venta</h3>
+            <div class="d-flex justify-content-center align-items-center" style="height: 60%;">
+                <p class="display-3" style="background: linear-gradient(45deg, #ff7e5f, #D03139); -webkit-background-clip: text; color: transparent; text-align: end;">S/.{{ costo_promedio_venta }}<br>.00</p>
+            </div>
+        </div>
+    </div>
 
+</div>
 
 <script>
-    const chartData = {{ data|safe }};
+    const chartData = {{ data_ventas|safe }};
     const chartDataPagos = {{ data_pagos|safe }};
+    const chartMeses = {{ meses|safe }};
+
+    console.log(chartData);
+    console.log(chartMeses);
     
-    // Gráfico Lineal de Ventas del Año
+    // Gráfico Linear
     const graficoLinealVentasAnio = echarts.init(document.getElementById('graficoLinealVentasAnio'));
     const optionLineal = {
         tooltip: {},
         
         xAxis: {
             type: 'category',
-            data: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+            data: chartMeses
         },
         yAxis: {
             type: 'value'
@@ -163,6 +149,7 @@
         graficoCircularPagos.resize();
     });
 </script>
+
 
 
 
