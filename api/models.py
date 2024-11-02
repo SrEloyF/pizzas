@@ -104,6 +104,23 @@ class Pago(models.Model):
     def __str__(self):
         return f"Pago {self.pk} - {self.estado}"
 
+<<<<<<< HEAD
+=======
+class Pedido(models.Model):
+    sucursal = models.ForeignKey(Sucursal, on_delete=models.PROTECT)
+    #pago = models.ForeignKey(Pago, on_delete=models.PROTECT)
+    cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
+    fecha_pedido = models.DateTimeField(auto_now_add=True)
+    fecha_entrega = models.DateField()
+    estado = models.CharField(max_length=45)
+    nombre_ref = models.CharField(max_length=45)
+    correo = models.CharField(max_length=85)
+    direccion = models.CharField(max_length=85)
+
+    def __str__(self):
+        return f"Pedido {self.pk} - {self.estado}"
+
+>>>>>>> a6122a71172f805ad17042d564cc852296f5a325
 class ProductoVenta(models.Model):
     nombre = models.CharField(max_length=70)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
