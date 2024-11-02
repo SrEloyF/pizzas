@@ -95,15 +95,6 @@ class Pedido(models.Model):
     def __str__(self):
         return f"Pedido {self.pk} - {self.estado}"
 
-class Pago(models.Model):
-    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
-    monto = models.DecimalField(max_digits=10, decimal_places=2)
-    metodo_pago = models.CharField(max_length=45)
-    estado = models.CharField(max_length=45)
-
-    def __str__(self):
-        return f"Pago {self.pk} - {self.estado}"
-
 class Pedido(models.Model):
     sucursal = models.ForeignKey(Sucursal, on_delete=models.PROTECT)
     #pago = models.ForeignKey(Pago, on_delete=models.PROTECT)
@@ -117,6 +108,15 @@ class Pedido(models.Model):
 
     def __str__(self):
         return f"Pedido {self.pk} - {self.estado}"
+    
+class Pago(models.Model):
+    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
+    monto = models.DecimalField(max_digits=10, decimal_places=2)
+    metodo_pago = models.CharField(max_length=45)
+    estado = models.CharField(max_length=45)
+
+    def __str__(self):
+        return f"Pago {self.pk} - {self.estado}"
 
 class ProductoVenta(models.Model):
     nombre = models.CharField(max_length=70)
