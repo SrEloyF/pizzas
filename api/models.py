@@ -85,21 +85,7 @@ class Sucursal(models.Model):
 class Pedido(models.Model):
     sucursal = models.ForeignKey(Sucursal, on_delete=models.PROTECT)
     cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
-    fecha_pedido = models.DateTimeField(auto_now_add=True)
-    fecha_entrega = models.DateField()
-    estado = models.CharField(max_length=45)
-    nombre_ref = models.CharField(max_length=45)
-    correo = models.CharField(max_length=85)
-    direccion = models.CharField(max_length=85)
-
-    def __str__(self):
-        return f"Pedido {self.pk} - {self.estado}"
-
-class Pedido(models.Model):
-    sucursal = models.ForeignKey(Sucursal, on_delete=models.PROTECT)
-    #pago = models.ForeignKey(Pago, on_delete=models.PROTECT)
-    cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
-    fecha_pedido = models.DateTimeField(auto_now_add=True)
+    fecha_pedido = models.DateTimeField()
     fecha_entrega = models.DateField()
     estado = models.CharField(max_length=45)
     nombre_ref = models.CharField(max_length=45)
@@ -118,21 +104,28 @@ class Pago(models.Model):
     def __str__(self):
         return f"Pago {self.pk} - {self.estado}"
 
-class ProductoVenta(models.Model):
-    nombre = models.CharField(max_length=70)
+class Repertorio(models.Model):
+    titulo = models.CharField(max_length=60)
+    descripcion = models.CharField(max_length=120)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
-    descripcion = models.CharField(max_length=45)
-    imagen = models.ImageField(upload_to='productos_venta/', null=True, blank=True)
+    fecha_inic = models.DateField()
+    fecha_fin = models.DateField()
+    imagen = models.ImageField(upload_to='repertorio/', null=True, blank=True)
+
+class ProductoVenta(models.Model):
+    repertorio = models.ForeignKey(Repertorio, on_delete= models.PROTECT)
+    fecha_venta = models.DateField()
+    estado = models.CharField(max_length=30)
 
     def __str__(self):
-        return self.nombre
+        return f"Prod Venta {self.repertorio} - {self.fecha_venta} - {self.estado}"
 
 class ProductoPrima(models.Model):
     categoria = models.ForeignKey(Categoria, on_delete=models.PROTECT)
     nombre = models.CharField(max_length=45)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     descripcion = models.CharField(max_length=100)
-    imagen = models.ImageField(upload_to='productos_prima/', null=True, blank=True)
+    stock = models.PositiveIntegerField()
 
     def __str__(self):
         return self.nombre

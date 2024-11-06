@@ -3,9 +3,9 @@
 {% block titulo %}Añadir/Editar {{ model_name }}{% endblock %}
 
 {% block contenido %}
-    <h2 class="ms-3">{{ model_name|capfirst }}</h2>
+    <h2 class="m-3">{{ model_name|capfirst }}</h2>
 
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" class="pe-3">
         {% csrf_token %}
         <div class="row p-3">
             {% for field in form %}

@@ -4,102 +4,79 @@
 
 {% block contenido %}
 
-<div class="container-fluid min-vh-100">  
-    <div class="row my-3">
-        <div class="col-9">
-            <div class="box h-100">
-                <h3 class="text-center py-2">Mejor empleado por meses</h3>
-                <div id="graficoLinealVentasAnio" class="h-100"></div>
-            </div>
-        </div>
-        <div class="col-3">
-            <div class="box h-100 d-flex flex-column justify-content-center">
-                <h3 class="text-center my-2">Empleados con más ingresos</h3>
-                
-                <div class="flex-grow-1 d-flex flex-column justify-content-center px-4">
-                    <div class="d-flex justify-content-between">
-                        <h4>Juan Perez</h4>
-                        <h4>100</h4>
-                    </div>
-                    <hr class="m-1">
-                    
-                    <div class="d-flex justify-content-between">
-                        <h4>Fabrizio Sánchez</h4>
-                        <h4>60</h4>
-                    </div>
-                    <hr class="m-1">
-                    
-                    <div class="d-flex justify-content-between">
-                        <h4>Larry Kapija</h4>
-                        <h4>50</h4>
-                    </div>
-                    <hr class="m-1">
-                    
-                    <div class="d-flex justify-content-between">
-                        <h4>Pablo Picaso</h4>
-                        <h4>40</h4>
-                    </div>
-                </div>
-            </div>            
+<div class="row h-50 my-3 mx-0">
+    <div class="col-9">
+        <div class="box h-100 d-flex flex-column">
+            <h3 class="text-center py-3 px-1">Clientes en el último año</h3>
+            <div id="graficoLinealVentasAnio" class="flex-grow-1"></div>
         </div>
     </div>
+    <div class="col-3">
+        <div class="box h-100 d-flex flex-column justify-content-center">
+            <h3 class="text-center py-3 px-1">Clientes más frecuentes</h3>
 
-    <div class="row my-3">
-        <!-- <div class="col-3">
-            <div class="box h-100">
-                <h3 class="text-center py-2">Métodos de pago</h3>
-                <div id="graficoCircularPagos" class="h-100"></div>
-            </div>
-        </div>
-        <div class="col-3">
-            <div class="box h-100 d-flex flex-column justify-content-center">
-                <h3 class="text-center my-2">Ingresos del mes</h3>
-                <div class="d-flex flex-grow-1 justify-content-center align-items-center">
-                    <p class="display-1" style="background: linear-gradient(45deg, #ff7e5f, #D03139); -webkit-background-clip: text; color: transparent; text-align: end;">S/.93<br>.30</p>
+            <div class="flex-grow-1 px-4">
+                <div class="d-flex justify-content-between">
+                    <h4>Juan Perez</h4>
+                    <h4>100</h4>
                 </div>
-            </div>
-        </div>-->
-        
-        <div class="col-3">
-            <div class="box h-100 d-flex flex-column justify-content-center">
-                <h3 class="text-center my-2">Empleados con más ventas</h3>
-                
-                <div class="flex-grow-1 d-flex flex-column justify-content-center px-4">
-                    <div class="d-flex justify-content-between">
-                        <h4>Juan Perez</h4>
-                        <h4>100</h4>
-                    </div>
-                    <hr class="m-1">
-                    
-                    <div class="d-flex justify-content-between">
-                        <h4>Fabrizio Sánchez</h4>
-                        <h4>60</h4>
-                    </div>
-                    <hr class="m-1">
-                    
-                    <div class="d-flex justify-content-between">
-                        <h4>Larry Kapija</h4>
-                        <h4>50</h4>
-                    </div>
-                    <hr class="m-1">
-                    
-                    <div class="d-flex justify-content-between">
-                        <h4>Pablo Picaso</h4>
-                        <h4>40</h4>
-                    </div>
-                </div>
-            </div>
-            
-        </div>
+                <hr class="m-1">
 
-        <!-- <div class="col-3">
-            <div class="box h-100 d-flex flex-column justify-content-center">
-                <h3 class="text-center my-2">Costo promedio de venta</h3>
-                <div class="d-flex flex-grow-1 justify-content-center align-items-center">
-                    <p class="display-1" style="background: linear-gradient(45deg, #ff7e5f, #D03139); -webkit-background-clip: text; color: transparent; text-align: end;">S/.93<br>.30</p>
+                <div class="d-flex justify-content-between">
+                    <h4>Fabrizio Sánchez</h4>
+                    <h4>60</h4>
+                </div>
+                <hr class="m-1">
+
+                <div class="d-flex justify-content-between">
+                    <h4>Larry Kapija</h4>
+                    <h4>50</h4>
+                </div>
+                <hr class="m-1">
+
+                <div class="d-flex justify-content-between">
+                    <h4>Pablo Picaso</h4>
+                    <h4>40</h4>
                 </div>
             </div>
-        </div> -->
+        </div>            
     </div>
 </div>
-{% endblock %}
+
+<div class="row h-50 my-2 mx-0">      
+    <!--cantidad de clientes que regresan luego de su primera compra-->
+    <div class="col-3 h-100">
+        <div class="box h-100 d-flex flex-column">
+            <h3 class="text-center py-3 px-1">Porcentaje de retención</h3>
+            <div class="flex-grow-1 d-flex justify-content-center align-items-center contenedor-texto">
+                <p class="color-numero">{{ porcentaje_retencion }}% </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-3 h-100">
+        <div class="box h-100 d-flex flex-column">
+            <h3 class="text-center py-3 px-1">Total de clientes</h3>
+            <div class="flex-grow-1 d-flex justify-content-center align-items-center contenedor-texto">
+                <p class="color-numero">{{ total_clientes }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-3 h-100">
+        <div class="box h-100 d-flex flex-column">
+            <h3 class="text-center py-3 px-1">Clientes nuevos este mes</h3>
+            <div class="flex-grow-1 d-flex justify-content-center align-items-center contenedor-texto">
+                <p class="color-numero">{{ clientes_nuevos_mes }}</p>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        const chartDataClientes = {{ data_clientes|safe }};
+        const arregloMeses = {{ meses|safe }};
+        console.log("hola")
+        console.log(arregloMeses);
+    </script>
+    {% endblock %}

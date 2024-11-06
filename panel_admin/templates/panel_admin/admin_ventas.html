@@ -3,23 +3,18 @@
 {% block titulo %}Admin - Ventas{% endblock %}
 
 {% block contenido %}
-
-<style>
-</style>
-
 <div class="row h-50 my-3 mx-0">
     <div class="col-9 h-100">
-        <div class="box h-100">
-            <h3 class="text-center py-3">Ventas en el último año</h3>
-            <div id="graficoLinealVentasAnio" class="h-75"></div>
+        <div class="box h-100 d-flex flex-column">
+            <h3 class="text-center py-3 px-1">Ventas en el último año</h3>
+            <div id="graficoLinealVentasAnio" class="flex-grow-1"></div>
         </div>
     </div>
 
     <div class="col-3 h-100">
-        <div class="box h-100">
-            <h3 class="text-center py-3">Días con más ventas</h3>
-            
-            <div class="flex-grow-1 d-flex flex-column justify-content-center px-4">
+        <div class="box h-100 d-flex flex-column">
+            <h3 class="text-center py-3 px-1">Días con más ventas</h3>
+            <div class="flex-grow-1 px-4">
                 {% if top_dias_data %}
                     {% for dia in top_dias_data %}
                         <div class="d-flex justify-content-between">
@@ -29,36 +24,35 @@
                         <hr class="m-1">
                     {% endfor %}
                 {% else %}
-                    <div class="text-center">
-                        <h4>Sin datos</h4>
-                    </div>
+                    <h4 class="text-center">Sin datos</h4>
                 {% endif %}
             </div>
         </div>
     </div>
 </div>
+
 <div class="row h-50 my-2 mx-0">
     <div class="col-3 h-100">
-        <div class="box h-100">
-            <h3 class="text-center py-3">Métodos de pago</h3>
-            <div id="graficoCircularPagos" class="h-75"></div>
+        <div class="box h-100 d-flex flex-column">
+            <h3 class="text-center py-3 px-1">Métodos de pago</h3>
+            <div id="graficoCircularPagos" class="flex-grow-1"></div>
         </div>
     </div>
 
     <div class="col-3 h-100">
-        <div class="box h-100">
-            <h3 class="text-center py-3">Ingresos del mes</h3>
-            <div class="d-flex justify-content-center align-items-center" style="height: 60%;">
-                <p class="display-3" style="background: linear-gradient(45deg, #ff7e5f, #D03139); -webkit-background-clip: text; color: transparent; text-align: end;">S/.{{ ingresos_mes }}<br>.00</p>
+        <div class="box h-100 d-flex flex-column">
+            <h3 class="text-center py-3 px-1">Ingresos del mes</h3>
+            <div class="flex-grow-1 d-flex justify-content-center align-items-center contenedor-texto">
+                <p class="color-numero">S/.{{ ingresos_mes }}</p>
             </div>
         </div>
     </div>
 
     <div class="col-3 h-100">
     <div class="box h-100">
-        <h3 class="text-center py-3">Horas con más ventas</h3>
+        <h3 class="text-center py-3 px-1">Horas con más ventas</h3>
         
-        <div class="flex-grow-1 d-flex flex-column justify-content-center px-4">
+        <div class="flex-grow-1 px-4">
             {% if top_horas_data %}
                 {% for hora in top_horas_data %}
                     <div class="d-flex justify-content-between">
@@ -78,49 +72,59 @@
 
 
     <div class="col-3 h-100">
-        <div class="box h-100">
-            <h3 class="text-center py-3">Costo promedio de venta</h3>
-            <div class="d-flex justify-content-center align-items-center" style="height: 60%;">
-                <p class="display-3" style="background: linear-gradient(45deg, #ff7e5f, #D03139); -webkit-background-clip: text; color: transparent; text-align: end;">S/.{{ costo_promedio_venta }}<br>.00</p>
+        <div class="box h-100 d-flex flex-column">
+            <h3 class="text-center py-3 px-1">Costo promedio de venta</h3>
+            <div class="flex-grow-1 d-flex justify-content-center align-items-center contenedor-texto">
+                <p class="color-numero">S/.{{ costo_promedio_venta }}</p>
             </div>
         </div>
     </div>
 
 </div>
-
 <script>
     const chartData = {{ data_ventas|safe }};
-    const chartDataPagos = {{ data_pagos|safe }};
     const chartMeses = {{ meses|safe }};
-
-    console.log(chartData);
-    console.log(chartMeses);
     
-    // Gráfico Linear
     const graficoLinealVentasAnio = echarts.init(document.getElementById('graficoLinealVentasAnio'));
-    const optionLineal = {
-        tooltip: {},
-        
+
+    const option = {
+        title: {
+            text: null,
+        },
+        tooltip: {
+            trigger: 'axis',
+        },
         xAxis: {
             type: 'category',
-            data: chartMeses
+            data: chartMeses,
+            axisLabel: {
+                rotate: 30
+            }
         },
         yAxis: {
-            type: 'value'
+            type: 'value',
+            name: 'Ventas',
         },
         series: [{
-            name: 'Datos',
+            name: 'Ventas',
             type: 'line',
-            data: chartData
+            data: chartData,
+            smooth: true,
+            itemStyle: {
+                color: '#FF6787'
+            },
+            lineStyle: {
+                width: 3
+            },
+            symbol: 'circle',
+            symbolSize: 8,
         }]
     };
-    
-    graficoLinealVentasAnio.setOption(optionLineal);
-    window.addEventListener('resize', () => {
-        graficoLinealVentasAnio.resize();
-    });
+
+    graficoLinealVentasAnio.setOption(option);
 
     // Gráfico Circular de Métodos de Pago
+    const chartDataPagos = {{ data_pagos|safe }};
     const graficoCircularPagos = echarts.init(document.getElementById('graficoCircularPagos'));
     const optionCircular = {
         tooltip: {
@@ -145,13 +149,5 @@
     };
 
     graficoCircularPagos.setOption(optionCircular);
-    window.addEventListener('resize', () => {
-        graficoCircularPagos.resize();
-    });
 </script>
-
-
-
-
-
 {% endblock %}

@@ -1,53 +1,50 @@
-# app1/views.py
-
 from rest_framework import generics
 from .models import *
 from .serializers import *
 
-class AreaListCreate(generics.ListCreateAPIView):
-    queryset = Area.objects.all()
+class ListCreateView(generics.ListCreateAPIView):
+    serializer_class = None
+    queryset = None
+
+    def get_queryset(self):
+        model = self.serializer_class.Meta.model
+        return model.objects.all()
+
+class AreaListCreate(ListCreateView):
     serializer_class = AreaSerializer
 
-class CategoriaListCreate(generics.ListCreateAPIView):
-    queryset = Categoria.objects.all()
+class CategoriaListCreate(ListCreateView):
     serializer_class = CategoriaSerializer
 
-class ClienteListCreate(generics.ListCreateAPIView):
-    queryset = Cliente.objects.all()
+class ClienteListCreate(ListCreateView):
     serializer_class = ClienteSerializer
 
-class SucursalListCreate(generics.ListCreateAPIView):
-    queryset = Sucursal.objects.all()
+class SucursalListCreate(ListCreateView):
     serializer_class = SucursalSerializer
 
-class PagoListCreate(generics.ListCreateAPIView):
-    queryset = Pago.objects.all()
+class PagoListCreate(ListCreateView):
     serializer_class = PagoSerializer
 
-class PedidoListCreate(generics.ListCreateAPIView):
-    queryset = Pedido.objects.all()
+class PedidoListCreate(ListCreateView):
     serializer_class = PedidoSerializer
 
-class ProductoVentaListCreate(generics.ListCreateAPIView):
-    queryset = ProductoVenta.objects.all()
+class ProductoVentaListCreate(ListCreateView):
     serializer_class = ProductoVentaSerializer
 
-class ProductoPrimaListCreate(generics.ListCreateAPIView):
-    queryset = ProductoPrima.objects.all()
+class ProductoPrimaListCreate(ListCreateView):
     serializer_class = ProductoPrimaSerializer
 
-class DetallePedidoListCreate(generics.ListCreateAPIView):
-    queryset = DetallePedido.objects.all()
+class DetallePedidoListCreate(ListCreateView):
     serializer_class = DetallePedidoSerializer
 
-class PaqueteListCreate(generics.ListCreateAPIView):
-    queryset = Paquete.objects.all()
+class PaqueteListCreate(ListCreateView):
     serializer_class = PaqueteSerializer
 
-class EmpleadoListCreate(generics.ListCreateAPIView):
-    queryset = Empleado.objects.all()
+class EmpleadoListCreate(ListCreateView):
     serializer_class = EmpleadoSerializer
 
-class HistorialListCreate(generics.ListCreateAPIView):
-    queryset = Historial.objects.all()
+class HistorialListCreate(ListCreateView):
     serializer_class = HistorialSerializer
+
+class RepertorioListCreate(ListCreateView):
+    serializer_class = RepertorioSerializer

@@ -52,8 +52,8 @@ class PedidoAdmin(admin.ModelAdmin):
 
 @admin.register(ProductoVenta)
 class ProductoVentaAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'precio', 'descripcion')
-    search_fields = ('nombre',)
+    list_display = ('repertorio', 'fecha_venta', 'estado')
+    search_fields = ('id',)
 
 @admin.register(ProductoPrima)
 class ProductoPrimaAdmin(admin.ModelAdmin):

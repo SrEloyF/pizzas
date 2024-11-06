@@ -20,11 +20,13 @@ from django.db.models.functions import TruncMonth, TruncDay, TruncHour
 from django.db.models import Count, Sum, Avg
 import locale
 
+locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
+hoy = timezone.now()
+meses = [(hoy - timedelta(days=30 * i)).strftime("%B %Y") for i in range(11, -1, -1)]
+
 @login_required(login_url='/panel_admin/login/')
 def vista_admin_ventas(request):
     #ultimos 12 meses
-    hoy = timezone.now()
-    locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
     hace_12_meses = hoy - timedelta(days=365)
     ventas_mensuales = (
         Pedido.objects
@@ -34,7 +36,6 @@ def vista_admin_ventas(request):
         .annotate(total_ventas=Count('id'))
         .order_by('mes')
     )
-    meses = [(hoy - timedelta(days=30 * i)).strftime("%B %Y") for i in range(11, -1, -1)]
     data_ventas = []
     for mes in meses:
         total = next((venta['total_ventas'] for venta in ventas_mensuales if venta['mes'].strftime("%B %Y") == mes), 0)
@@ -80,23 +81,175 @@ def vista_admin_ventas(request):
         'costo_promedio_venta': costo_promedio_venta,
     })
 
+@login_required(login_url='/panel_admin/login/')
+def vista_admin_clientes(request):
+    data_clientes = [10, 20, 30, 40, 50, 10, 20, 30, 40, 50, 23, 33]
+    porcentaje_retencion = 50.3
+    total_clientes = 100
+    clientes_nuevos_mes = 14
+
+    return render(request, 'panel_admin/admin_clientes.html', {
+        'data_clientes': json.dumps(data_clientes),
+        'meses': json.dumps(meses),
+        'porcentaje_retencion': porcentaje_retencion,
+        'total_clientes': total_clientes,
+        'clientes_nuevos_mes' : clientes_nuevos_mes
+    })
+    
 
 @login_required(login_url='/panel_admin/login/')
 def vista_admin_empleados(request):
-    return render(request, 'panel_admin/admin_empleados.html')
+    data_empleados_mas_ventas = [
+        ["Empleado1", 1],
+        ["Empleado2", 2],
+        ["Empleado3", 3],
+        ["Empleado4", 4],
+        ["Empleado5", 5],
+        ["Empleado6", 6],
+        ["Empleado7", 7],
+        ["Empleado8", 8],
+        ["Empleado9", 9],
+        ["Empleado10", 10],
+        ["Empleado11", 11],
+        ["Empleado12", 12]
+    ]
 
-@login_required(login_url='/panel_admin/login/')
-def vista_admin_plantilla(request):
-    return render(request, 'panel_admin/admin_base.html')
+    empleados_mas_ingresos = [
+        ["Empleado1", 1],
+        ["Empleado2", 2],
+        ["Empleado3", 3],
+        ["Empleado4", 4],
+    ]
+
+    empleados_mas_eficaces = [
+        ["Empleado5", 1],
+        ["Empleado6", 2],
+        ["Empleado7", 3],
+        ["Empleado8", 4],
+    ]
+
+    estado_empleados = [
+        ["Activo", 116],
+        ["Inactivo", 22],
+    ]
+
+    ventas_promedio_por_empleado = 2.4
+    horas_trabajadas_por_empleado = 2.6
+
+    return render(request, 'panel_admin/admin_empleados.html',{
+        'meses': json.dumps(meses),
+        'data_empleados_mas_ventas': json.dumps(data_empleados_mas_ventas),
+        'empleados_mas_ingresos': empleados_mas_ingresos,
+        'empleados_mas_eficaces': empleados_mas_eficaces,
+        'ventas_promedio_por_empleado': ventas_promedio_por_empleado,
+        'horas_trabajadas_por_empleado' : horas_trabajadas_por_empleado,
+        'estado_empleados': estado_empleados
+    })
 
 @login_required(login_url='/panel_admin/login/')
 def vista_admin_sucursales(request):
-    return render(request, 'panel_admin/admin_sucursales.html')
+
+    data_clientes_sucursal = [
+        ["Sucursal 1", 1],
+        ["Sucursal 11", 81],
+        ["Sucursal 2", 2],
+        ["Sucursal 3", 3],
+    ]
+
+    data_empleados_sucursal = [
+        ["Sucursal 9", 1],
+        ["Sucursal 5", 2],
+        ["Sucursal 6", 3],
+    ]
+
+    ganancias_promedio_sucursal = 349
+    pedidos_promedio_sucursal = 4
+
+    return render(request, 'panel_admin/admin_sucursales.html',{
+        'meses': json.dumps(meses),
+        'data_clientes_sucursal': data_clientes_sucursal,
+        'data_empleados_sucursal': data_empleados_sucursal,
+        'ganancias_promedio_sucursal': ganancias_promedio_sucursal,
+        'pedidos_promedio_sucursal': pedidos_promedio_sucursal,
+    })
 
 @login_required(login_url='/panel_admin/login/')
-def vista_admin_clientes(request):
-    return render(request, 'panel_admin/admin_clientes.html')
+def vista_admin_pprima(request):
+    costo_total_inventario = 326
+    precio_promedio_prod_prima = 42
 
+    prod_prima_mas_vendidos = [
+        ["Producto prima 1", 1],
+        ["Producto prima 2", 2],
+        ["Producto prima 3", 3],
+    ]
+
+    prod_prima_menos_vendidos = [
+        ["Producto prima 4", 1],
+        ["Producto prima 5", 2],
+        ["Producto prima 6", 3],
+    ]
+
+    prod_prima_bajo_stock = [
+        ["Producto prima 7", 1],
+        ["Producto prima 8", 2],
+        ["Producto prima 9", 3],
+    ]
+
+    categorias_mas_vendidas = [
+        ["Categoría 1", 1],
+        ["Categoría 2", 2],
+        ["Categoría 3", 3],
+    ]
+
+    return render(request, 'panel_admin/admin_pprima.html',{
+        'costo_total_inventario': costo_total_inventario,
+        'precio_promedio_prod_prima': precio_promedio_prod_prima,
+        'prod_prima_mas_vendidos': prod_prima_mas_vendidos,
+        'prod_prima_menos_vendidos': prod_prima_menos_vendidos,
+        'prod_prima_bajo_stock': prod_prima_bajo_stock,
+        'categorias_mas_vendidas': categorias_mas_vendidas
+    })
+
+@login_required(login_url='/panel_admin/login/')
+def vista_admin_pventa(request):
+    costo_total_inventario = 326
+    precio_promedio_prod_prima = 42
+
+    prod_prima_mas_vendidos = [
+        ["Producto prima 1", 1],
+        ["Producto prima 2", 2],
+        ["Producto prima 3", 3],
+    ]
+
+    prod_prima_menos_vendidos = [
+        ["Producto prima 4", 1],
+        ["Producto prima 5", 2],
+        ["Producto prima 6", 3],
+    ]
+
+    prod_prima_bajo_stock = [
+        ["Producto prima 7", 1],
+        ["Producto prima 8", 2],
+        ["Producto prima 9", 3],
+    ]
+
+    categorias_mas_vendidas = [
+        ["Categoría 1", 1],
+        ["Categoría 2", 2],
+        ["Categoría 3", 3],
+    ]
+
+    return render(request, 'panel_admin/admin_pventa.html',{
+        'costo_total_inventario': costo_total_inventario,
+        'precio_promedio_prod_prima': precio_promedio_prod_prima,
+        'prod_prima_mas_vendidos': prod_prima_mas_vendidos,
+        'prod_prima_menos_vendidos': prod_prima_menos_vendidos,
+        'prod_prima_bajo_stock': prod_prima_bajo_stock,
+        'categorias_mas_vendidas': categorias_mas_vendidas
+    })
+
+#########################
 def login_view(request):
     if request.method == 'POST':
         username = request.POST['usuario']
@@ -186,7 +339,7 @@ class ProductoVentaListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['campos'] = ['id', 'nombre', 'precio', 'descripcion', 'imagen']
+        context['campos'] = ['id', 'repertorio','fecha_venta', 'estado']
         context['model_name'] = "ProductosVenta"
         return context
 
@@ -199,7 +352,7 @@ class ProductoPrimaListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['campos'] = ['id', 'categoria', 'nombre', 'precio', 'descripcion', 'imagen']
+        context['campos'] = ['id', 'categoria', 'nombre', 'precio', 'descripcion', 'stock']
         context['model_name'] = "ProductosPrima"
         return context
 
@@ -216,6 +369,88 @@ class PaqueteListView(LoginRequiredMixin, ListView):
         context['model_name'] = "Paquetes"
         return context
 
+class PedidoListView(LoginRequiredMixin, ListView):
+    login_url = '/panel_admin/login/'
+    model = Pedido
+    template_name = 'panel_admin/lista.html'
+    context_object_name = 'objetos'
+    paginate_by = 8 
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['campos'] = ['id', 'sucursal', 'cliente', 'fecha_pedido', 'fecha_entrega', 'estado', 'nombre_ref', 'correo', 'direccion']
+        context['model_name'] = "Pedidos"
+        return context
+
+class DetallePedidoListView(LoginRequiredMixin, ListView):
+    login_url = '/panel_admin/login/'
+    model = DetallePedido
+    template_name = 'panel_admin/lista.html'
+    context_object_name = 'objetos'
+    paginate_by = 8 
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['campos'] = ['id', 'pedido', 'proventa', 'cantidad', 'precio']
+        context['model_name'] = "detallepedido"
+        return context
+
+class PagoListView(LoginRequiredMixin, ListView):
+    login_url = '/panel_admin/login/'
+    model = Pago
+    template_name = 'panel_admin/lista.html'
+    context_object_name = 'objetos'
+    paginate_by = 8 
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['campos'] = ['id', 'pedido', 'monto', 'metodo_pago', 'estado']
+        context['model_name'] = "Pagos"
+        return context
+
+class HistorialListView(LoginRequiredMixin, ListView):
+    login_url = '/panel_admin/login/'
+    model = Historial
+    template_name = 'panel_admin/lista.html'
+    context_object_name = 'objetos'
+    paginate_by = 8 
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['campos'] = ['id', 'empleado', 'pedido', 'detalle', 'fecha']
+        context['model_name'] = "Historial"
+        return context
+
+
+
+class ClienteListView(LoginRequiredMixin, ListView):
+    login_url = '/panel_admin/login/'
+    model = Cliente
+    template_name = 'panel_admin/lista.html'
+    context_object_name = 'objetos'
+    paginate_by = 8 
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['campos'] = ['id', 'usuario', 'correo', 'telefono']
+        context['model_name'] = "Clientes"
+        return context
+
+
+class RepertorioListView(LoginRequiredMixin, ListView):
+    login_url = '/panel_admin/login/'
+    model = Repertorio
+    template_name = 'panel_admin/lista.html'
+    context_object_name = 'objetos'
+    paginate_by = 8 
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['campos'] = ['id', 'titulo', 'descripcion', 'precio', 'fecha_inic', 'fecha_fin', 'imagen']
+        context['model_name'] = "Repertorios"
+        return context
+
+
 ################################
 class ModelFactory:
     models_forms = {
@@ -226,7 +461,13 @@ class ModelFactory:
         'productosventa': (ProductoVenta, ProductoVentaForm),
         'productosprima': (ProductoPrima, ProductoPrimaForm),
         'paquetes': (Paquete, PaqueteForm),
-        'usuarioadmins': (UsuarioAdmin, UsuarioAdminForm)
+        'pedidos': (Pedido,PedidoForm),
+        'detallepedido': (DetallePedido, DetallePedidoForm),
+        'pagos': (PagoListView, PagoForm),
+        'historial': (HistorialListView, HistorialForm),
+        'clientes': (ClienteListView, ClienteForm),
+        'repertorios' : (RepertorioListView, RepertorioForm),
+        'usuarioadmins': (UsuarioAdmin, UsuarioAdminForm),
     }
 
     @classmethod

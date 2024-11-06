@@ -2,18 +2,12 @@
 
 {% load filters %}
 
-{% block titulo %}Listado{% endblock %}
+{% block titulo %}Listado {{ model_name }}{% endblock %}
 
 {% block contenido %}
     <div class="m-3">
-
-    {% if model_name == 'productosventa' %}
-        <h2>Listado de Productos Venta</h2>
-    {% elif model_name == 'productosprima' %}
-        <h2>Listado de Productos Prima</h2>
-    {% else %}
         <h2>Listado de {{ model_name|capfirst }}</h2>
-    {% endif %}
+
 
     <div class="mb-3">
         <a href="{% url 'crear_objeto' model_name=model_name|lower %}" class="btn btn-success">
