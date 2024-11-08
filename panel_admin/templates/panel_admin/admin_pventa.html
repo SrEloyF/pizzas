@@ -3,19 +3,19 @@
 {% block titulo %}Admin - Prod. Venta{% endblock %}
 
 {% block contenido %}
-<div class="row h-50 my-3 mx-0">
-    <div class="col-9 h-100">
-        <div class="box h-100 d-flex flex-column justify-content-center">
+<div class="row custom-height mx-0 py-2">
+    <div class="col-lg-9 col-12 pt-3">
+        <div class="box d-flex flex-column h-100">
             <h3 class="text-center py-3 px-1">Productos Venta más vendidos</h3>
-            <div id="graficoBarrasProdPrimaMasVendidos" class="flex-grow-1"></div>
+            <div id="graficoBarrasProdPrimaMasVendidos" class="flex-grow-1 contenedor-grafico"></div>
         </div>
     </div>
 
-    <div class="col-3 h-100">
-        <div class="box h-100 d-flex flex-column">
+    <div class="col-lg-3 col-12 pt-3">
+        <div class="box d-flex flex-column h-100">
             <h3 class="text-center py-3 px-1">Productos Venta menos vendidos</h3>
             <div class="flex-grow-1 px-4">
-               {% if prod_prima_menos_vendidos %}
+                {% if prod_prima_menos_vendidos %}
                     {% for prod in prod_prima_menos_vendidos %}
                         <div class="d-flex justify-content-between">
                             <h4>{{ prod.0 }}</h4>
@@ -27,23 +27,22 @@
                     <h4 class="text-center">Sin datos</h4>
                 {% endif %}
             </div>
-
         </div>
     </div>
-
 </div>
 
-<div class="row h-50 my-2 mx-0">
-    <div class="col-3 h-100">
-        <div class="box h-100 d-flex flex-column">
+<div class="row custom-height mx-0 py-2">
+    <div class="col-lg-3 col-md-4 col-sm-6 col-12 pt-3">
+        <div class="box d-flex flex-column h-100">
             <h3 class="text-center py-3 px-1">Precio promedio de productos Venta</h3>
-            <div class="d-flex flex-grow-1 justify-content-center align-items-center contenedor-texto">
+            <div class="flex-grow-1 d-flex justify-content-center align-items-center contenedor-texto">
                 <p class="color-numero">S/.{{ precio_promedio_prod_prima }}</p>
             </div>
         </div>
     </div>
-    <div class="col-3 h-100">
-        <div class="box h-100 d-flex flex-column">
+
+    <div class="col-lg-3 col-md-4 col-sm-6 col-12 pt-3">
+        <div class="box d-flex flex-column h-100">
             <h3 class="text-center py-3 px-1">Productos Venta con bajo stock</h3>
             <div class="flex-grow-1 px-4">
                 {% if prod_prima_bajo_stock %}
@@ -61,8 +60,8 @@
         </div>
     </div>
 
-    <div class="col-3 h-100">
-        <div class="box h-100 d-flex flex-column">
+    <div class="col-lg-3 col-md-4 col-sm-6 col-12 pt-3">
+        <div class="box d-flex flex-column h-100">
             <h3 class="text-center py-3 px-1">Categorías más vendidas</h3>
             <div class="flex-grow-1 px-4">
                 {% if prod_prima_bajo_stock %}
@@ -77,10 +76,8 @@
                     <h4 class="text-center">Sin datos</h4>
                 {% endif %}
             </div>
-
         </div>
     </div>
-
 </div>
 <script>
         const chartDataProductos = {{ prod_prima_mas_vendidos|safe }};

@@ -59,7 +59,7 @@
                             <a href="{% url 'admin_clientes' %}" class="sidebar-link">Info Clientes</a>
                         </li>
                         <li class="sidebar-item">
-                            <a href="{% url 'cliente_lista' %}" class="sidebar-link">Crud Clientes</a>
+                            <a href="{% url 'clientes_lista' %}" class="sidebar-link">Crud Clientes</a>
                         </li>
                     </ul>
                 </li>
@@ -101,23 +101,6 @@
                     </ul>
                 </li>
 
-
-                <!--
-    <li class="sidebar-item">
-        <a href="#" class="sidebar-link collapsed has-dropdown {% if 'categorias' in request.path %}active{% endif %}" data-bs-toggle="collapse" data-bs-target="#categorias" aria-expanded="false" aria-controls="categorias" data-tooltip="Categorías">
-            <i class="fa-solid fa-bookmark"></i>
-            <span>Categorías</span>
-        </a>
-
-        <ul id="categorias" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
-            <li class="sidebar-item">
-                <a href="#" class="sidebar-link">Info Categoría</a>
-            </li>
-            <li class="sidebar-item">
-                <a href="{% url 'categorias_lista' %}" class="sidebar-link">Crud Categoría</a>
-            </li>
-        </ul>
-    </li>-->
                 <li class="sidebar-item">
                     <a href="#"
                         class="sidebar-link collapsed has-dropdown {% if 'productosprima' in request.path %}active{% endif %}"
@@ -155,24 +138,6 @@
                         </li>
                     </ul>
                 </li>
-
-                <!--
-<li class="sidebar-item">
-    <a href="#" class="sidebar-link collapsed has-dropdown {% if 'areas' in request.path %}active{% endif %}" data-bs-toggle="collapse" data-bs-target="#areas" aria-expanded="false" aria-controls="areas" data-tooltip="Áreas">
-        <i class="bi bi-person-lines-fill"></i>
-        <span>Áreas</span>
-    </a>
-
-    <ul id="areas" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
-        <li class="sidebar-item">
-            <a href="#" class="sidebar-link">Info Áreas</a>
-        </li>
-        <li class="sidebar-item">
-            <a href="{% url 'areas_lista' %}" class="sidebar-link">Crud Áreas</a>
-        </li>
-    </ul>
-</li>-->
-
                 <li class="sidebar-item">
                     <a href="{% url 'categorias_lista' %}"
                         class="sidebar-link {% if 'categoria' in request.path %}active{% endif %}"
@@ -218,7 +183,7 @@
                 </li>
 
                 <li class="sidebar-item">
-                    <a href="{% url 'pago_lista' %}"
+                    <a href="{% url 'pagos_lista' %}"
                         class="sidebar-link {% if 'pago' in request.path %}active{% endif %}" data-tooltip="Pagos">
                         <i class="fa-solid fa-coins"></i>
                         <span>Pagos</span>
@@ -242,7 +207,7 @@
                 </li>
 
                 <li class="sidebar-item">
-                    <a href="{% url 'repertorio_lista' %}" class="sidebar-link {% if 'repertorio' in request.path %}active{% endif %}" data-tooltip="Repertorio">
+                    <a href="{% url 'repertorios_lista' %}" class="sidebar-link {% if 'repertorio' in request.path %}active{% endif %}" data-tooltip="Repertorio">
                         <i class="fa-solid fa-ticket"></i>
                         <span>Repertorio</span>
                     </a>

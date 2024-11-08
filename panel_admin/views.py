@@ -16,8 +16,8 @@ from django.contrib.auth import authenticate, login
 
 from django.utils import timezone
 from datetime import timedelta
-from django.db.models.functions import TruncMonth, TruncDay, TruncHour
-from django.db.models import Count, Sum, Avg
+from django.db.models.functions import TruncMonth, TruncDay, TruncHour, Concat
+from django.db.models import Value, Count, Sum, Avg, F, Q, ExpressionWrapper, fields, DurationField, FloatField
 import locale
 
 locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
@@ -43,7 +43,7 @@ def vista_admin_ventas(request):
 
     #metodos pagos
     metodos_pago = Pago.objects.values('metodo_pago').annotate(cantidad=Count('id'))
-    data_pagos = [{pago['metodo_pago']: pago['cantidad']} for pago in metodos_pago]
+    data_pagos = [[pago['metodo_pago'], pago['cantidad']] for pago in metodos_pago]
 
     #top dias
     top_dias = Pedido.objects \
@@ -67,9 +67,11 @@ def vista_admin_ventas(request):
     inicio_mes = timezone.now().replace(day=1)
     fin_mes = inicio_mes + timedelta(days=31)
     ingresos_mes = Pago.objects.filter(pedido__fecha_pedido__range=(inicio_mes, fin_mes)).aggregate(Sum('monto'))['monto__sum'] or 0
+    ingresos_mes = round(ingresos_mes, 2)
 
     # Costo promedio de venta
     costo_promedio_venta = Pago.objects.aggregate(Avg('monto'))['monto__avg'] or 0
+    costo_promedio_venta = round(costo_promedio_venta, 2)
 
     return render(request, 'panel_admin/admin_ventas.html', {
         'data_ventas': json.dumps(data_ventas),
@@ -83,66 +85,158 @@ def vista_admin_ventas(request):
 
 @login_required(login_url='/panel_admin/login/')
 def vista_admin_clientes(request):
-    data_clientes = [10, 20, 30, 40, 50, 10, 20, 30, 40, 50, 23, 33]
-    porcentaje_retencion = 50.3
-    total_clientes = 100
-    clientes_nuevos_mes = 14
+    # 1. Clientes por cada mes en el último año
+    hoy = timezone.now()
+    clientes_por_cada_mes_ultimo_anio = [
+        Pedido.objects.filter(
+            fecha_pedido__year=hoy.year if hoy.month >= mes else hoy.year - 1,
+            fecha_pedido__month=mes
+        ).values('cliente').distinct().count()
+        for mes in range(1, 13)
+    ]
+    
+    # 2. Porcentaje de retención de clientes
+    total_clientes = Cliente.objects.count()
+    clientes_recurrentes = Cliente.objects.filter(
+        pedido__isnull=False
+    ).annotate(num_pedidos=Count('pedido')).filter(num_pedidos__gt=1).count()
+    porcentaje_retencion = (clientes_recurrentes / total_clientes * 100) if total_clientes else 0
+
+    # 3. Total de clientes
+    total_clientes = Cliente.objects.count()
+    
+    # 4. Nuevos clientes en el mes actual
+    clientes_nuevos_mes = Cliente.objects.filter(
+        pedido__fecha_pedido__year=hoy.year,
+        pedido__fecha_pedido__month=hoy.month
+    ).count()
+
+    # 5. Clientes con más pedidos
+    clientes_mas_frecuentes = (
+        Cliente.objects.annotate(total_pedidos=Count('pedido'))
+        .order_by('-total_pedidos')[:4]
+        .values_list('usuario', 'total_pedidos')
+    )
 
     return render(request, 'panel_admin/admin_clientes.html', {
-        'data_clientes': json.dumps(data_clientes),
+        'clientes_por_cada_mes_ultimo_anio': json.dumps(clientes_por_cada_mes_ultimo_anio),
         'meses': json.dumps(meses),
-        'porcentaje_retencion': porcentaje_retencion,
+        'porcentaje_retencion': round(porcentaje_retencion, 2),
         'total_clientes': total_clientes,
-        'clientes_nuevos_mes' : clientes_nuevos_mes
+        'clientes_nuevos_mes': clientes_nuevos_mes,
+        'clientes_mas_frecuentes': list(clientes_mas_frecuentes)
     })
     
 
 @login_required(login_url='/panel_admin/login/')
 def vista_admin_empleados(request):
-    data_empleados_mas_ventas = [
-        ["Empleado1", 1],
-        ["Empleado2", 2],
-        ["Empleado3", 3],
-        ["Empleado4", 4],
-        ["Empleado5", 5],
-        ["Empleado6", 6],
-        ["Empleado7", 7],
-        ["Empleado8", 8],
-        ["Empleado9", 9],
-        ["Empleado10", 10],
-        ["Empleado11", 11],
-        ["Empleado12", 12]
-    ]
+    hoy = timezone.now()
+
+    # 1. Empleados con más ventas en los últimos 12 meses
+    data_empleados_mas_ventas_query = (
+        Empleado.objects.annotate(
+            total_pedidos=Count('historial__pedido'),
+            nombre_completo=Concat('nombre', Value(' '), 'apellido')  # Concatenar nombre y apellido
+        )
+        .order_by('-total_pedidos')[:12]
+        .values_list('nombre_completo', 'total_pedidos')  # Seleccionar el nombre completo y total_pedidos
+    )
+
+    # Convertir el QuerySet en la estructura deseada
+    data_empleados_mas_ventas = [[nombre_completo, total_pedidos] for nombre_completo, total_pedidos in data_empleados_mas_ventas_query]
+    # 2. Empleados que han generado más ingresos en todo el tiempo
+    empleados_mas_ingresos = (
+        Empleado.objects.annotate(total_ingresos=Sum('historial__pedido__pago__monto'))
+        .order_by('-total_ingresos')[:4]
+        .values_list('nombre', 'total_ingresos')
+    )
 
     empleados_mas_ingresos = [
-        ["Empleado1", 1],
-        ["Empleado2", 2],
-        ["Empleado3", 3],
-        ["Empleado4", 4],
+        (nombre, total_ingresos if total_ingresos is not None else 0)
+        for nombre, total_ingresos in empleados_mas_ingresos
     ]
+    
+    # 3. Empleados más eficaces (menor tiempo entre fecha_pedido y fecha_entrega)
+    empleados_mas_eficaces_query = (
+        Empleado.objects.annotate(
+            tiempo_entrega=ExpressionWrapper(
+                F('historial__pedido__fecha_entrega') - F('historial__pedido__fecha_pedido'),
+                output_field=DurationField()
+            )
+        )
+        .values('nombre', 'apellido')
+        .annotate(
+            promedio_tiempo=Avg('tiempo_entrega'),
+            nombre_completo=Concat('nombre', Value(' '), 'apellido')
+        )
+        .order_by('promedio_tiempo')[:4]
+        .values_list('nombre_completo', 'promedio_tiempo')
+    )
 
+    # Convertir el QuerySet en la estructura deseada, en segundos
     empleados_mas_eficaces = [
-        ["Empleado5", 1],
-        ["Empleado6", 2],
-        ["Empleado7", 3],
-        ["Empleado8", 4],
+        [
+            nombre_completo, 
+            (promedio_tiempo.total_seconds() / 60) if promedio_tiempo is not None else 0
+        ]
+        for nombre_completo, promedio_tiempo in empleados_mas_eficaces_query
     ]
 
+    # 4. Estados de los empleados
     estado_empleados = [
-        ["Activo", 116],
-        ["Inactivo", 22],
+        ["Disponible", Empleado.objects.filter(estado="disponible").count()],
+        ["No Disponible", Empleado.objects.filter(estado="no_disponible").count()],
     ]
+    
+    # 5. Ventas promedio por empleado
+    """
+    ventas_promedio_por_empleado = (
+        Historial.objects
+        .values('empleado')  # Agrupar por empleado
+        .annotate(
+            total_ventas=Sum(
+                F('pedido__detallepedido__cantidad') * F('pedido__detallepedido__precio')
+            )  # Sumar el total de ventas a través de los detalles del pedido
+        )
+        .aggregate(
+            promedio_ventas=Sum('total_ventas') / Count('empleado')  # Calcular el promedio de ventas por empleado
+        )['promedio_ventas'] or 0  # Si no hay resultados, devolver 0
+    )
+    """
+    ventas_promedio_por_empleado = 1.2
 
-    ventas_promedio_por_empleado = 2.4
-    horas_trabajadas_por_empleado = 2.6
+    # 6. Tiempo promedio entre pedidos.fecha_pedido y pedidos.fecha_entrega en segundos
+    tiempo_promedio_pedido = (
+        Pedido.objects.annotate(
+            tiempo=ExpressionWrapper(
+                F('fecha_entrega') - F('fecha_pedido'),
+                output_field=DurationField()  # Calcula la diferencia como un DurationField
+            )
+        )
+        .aggregate(
+            total_tiempo=Sum('tiempo'),
+            total_pedidos=Count('id')
+        )
+    )
 
-    return render(request, 'panel_admin/admin_empleados.html',{
+    # Realiza la división en Python para obtener el promedio en horas
+    if tiempo_promedio_pedido['total_tiempo'] and tiempo_promedio_pedido['total_pedidos']:
+        promedio_segundos = tiempo_promedio_pedido['total_tiempo'].total_seconds()
+        tiempo_promedio_pedido = (promedio_segundos / 3600) / tiempo_promedio_pedido['total_pedidos']
+        tiempo_promedio_pedido = round(tiempo_promedio_pedido, 2)
+    else:
+        tiempo_promedio_pedido = 0  # Si no hay datos, establecer a 0
+
+
+
+
+    return render(request, 'panel_admin/admin_empleados.html', {
         'meses': json.dumps(meses),
-        'data_empleados_mas_ventas': json.dumps(data_empleados_mas_ventas),
-        'empleados_mas_ingresos': empleados_mas_ingresos,
-        'empleados_mas_eficaces': empleados_mas_eficaces,
+        'data_empleados_mas_ventas': json.dumps(list(data_empleados_mas_ventas)),
+        'empleados_mas_ingresos': list(empleados_mas_ingresos),
+        'empleados_mas_eficaces': list(empleados_mas_eficaces),
         'ventas_promedio_por_empleado': ventas_promedio_por_empleado,
-        'horas_trabajadas_por_empleado' : horas_trabajadas_por_empleado,
+        'tiempo_promedio_pedido': tiempo_promedio_pedido,
         'estado_empleados': estado_empleados
     })
 
@@ -265,191 +359,87 @@ def login_view(request):
 
     return render(request, 'panel_admin/login.html')
 
-class UsuarioAdminListView(LoginRequiredMixin, ListView):
+class BaseListView(LoginRequiredMixin, ListView):
     login_url = '/panel_admin/login/'
+    template_name = 'panel_admin/lista.html'
+    context_object_name = 'objetos'
+    paginate_by = 8
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['campos'] = self.campos
+        context['model_name'] = self.model_name
+        return context
+
+class UsuarioAdminListView(BaseListView):
     model = UsuarioAdmin
-    template_name = 'panel_admin/lista.html'
-    context_object_name = 'objetos'
-    paginate_by = 8
+    model_name = "UsuarioAdmins"
+    campos = ['id', 'usuario', 'rol']
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['campos'] = ['id', 'usuario', 'rol']
-        context['model_name'] = "UsuarioAdmins"
-        return context
-
-class AreaListView(LoginRequiredMixin, ListView):
-    login_url = '/panel_admin/login/'
+class AreaListView(BaseListView):
     model = Area
-    template_name = 'panel_admin/lista.html'
-    context_object_name = 'objetos'
-    paginate_by = 8
+    model_name = "Areas"
+    campos = ['id', 'nombre_area', 'descripcion']
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['campos'] = ['id', 'nombre_area', 'descripcion']
-        context['model_name'] = "Areas"
-        return context
-
-class CategoriaListView(LoginRequiredMixin, ListView):
-    login_url = '/panel_admin/login/'
+class CategoriaListView(BaseListView):
     model = Categoria
-    template_name = 'panel_admin/lista.html'
-    context_object_name = 'objetos'
-    paginate_by = 8
+    model_name = "Categorias"
+    campos = ['id', 'nombre', 'descripcion']
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['campos'] = ['id', 'nombre', 'descripcion']
-        context['model_name'] = "Categorias"
-        return context
-
-class SucursalListView(LoginRequiredMixin, ListView):
-    login_url = '/panel_admin/login/'
+class SucursalListView(BaseListView):
     model = Sucursal
-    template_name = 'panel_admin/lista.html'
-    context_object_name = 'objetos'
-    paginate_by = 8
+    model_name = "Sucursales"
+    campos = ['id', 'telefono', 'direccion', 'hora_inicio', 'hora_cierre']
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['campos'] = ['id', 'telefono', 'direccion', 'hora_inicio', 'hora_cierre']
-        context['model_name'] = "Sucursales"
-        return context
-
-class EmpleadoListView(LoginRequiredMixin, ListView):
-    login_url = '/panel_admin/login/'
+class EmpleadoListView(BaseListView):
     model = Empleado
-    template_name = 'panel_admin/lista.html'
-    context_object_name = 'objetos'
-    paginate_by = 8
+    model_name = "Empleados"
+    campos = ['id', 'sucursal', 'area', 'nombre', 'apellido', 'cargo', 'estado']
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['campos'] = ['id', 'sucursal', 'area', 'nombre', 'apellido', 'cargo', 'estado']
-        context['model_name'] = "Empleados"
-        return context
-
-class ProductoVentaListView(LoginRequiredMixin, ListView):
-    login_url = '/panel_admin/login/'
+class ProductoVentaListView(BaseListView):
     model = ProductoVenta
-    template_name = 'panel_admin/lista.html'
-    context_object_name = 'objetos'
-    paginate_by = 8
+    model_name = "ProductosVenta"
+    campos = ['id', 'repertorio','fecha_venta', 'estado']
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['campos'] = ['id', 'repertorio','fecha_venta', 'estado']
-        context['model_name'] = "ProductosVenta"
-        return context
-
-class ProductoPrimaListView(LoginRequiredMixin, ListView):
-    login_url = '/panel_admin/login/'
+class ProductoPrimaListView(BaseListView):
     model = ProductoPrima
-    template_name = 'panel_admin/lista.html'
-    context_object_name = 'objetos'
-    paginate_by = 8
+    model_name = "ProductosPrima"
+    campos = ['id', 'categoria', 'nombre', 'precio', 'descripcion', 'stock']
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['campos'] = ['id', 'categoria', 'nombre', 'precio', 'descripcion', 'stock']
-        context['model_name'] = "ProductosPrima"
-        return context
-
-class PaqueteListView(LoginRequiredMixin, ListView):
-    login_url = '/panel_admin/login/'
+class PaqueteListView(BaseListView):
     model = Paquete
-    template_name = 'panel_admin/lista.html'
-    context_object_name = 'objetos'
-    paginate_by = 8 
+    model_name = "Paquetes"
+    campos = ['id', 'proventa', 'proprima']
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['campos'] = ['id', 'proventa', 'proprima']
-        context['model_name'] = "Paquetes"
-        return context
-
-class PedidoListView(LoginRequiredMixin, ListView):
-    login_url = '/panel_admin/login/'
+class PedidoListView(BaseListView):
     model = Pedido
-    template_name = 'panel_admin/lista.html'
-    context_object_name = 'objetos'
-    paginate_by = 8 
+    model_name = "Pedidos"
+    campos = ['id', 'sucursal', 'cliente', 'fecha_pedido', 'fecha_entrega', 'estado', 'nombre_ref', 'correo', 'direccion']
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['campos'] = ['id', 'sucursal', 'cliente', 'fecha_pedido', 'fecha_entrega', 'estado', 'nombre_ref', 'correo', 'direccion']
-        context['model_name'] = "Pedidos"
-        return context
-
-class DetallePedidoListView(LoginRequiredMixin, ListView):
-    login_url = '/panel_admin/login/'
+class DetallePedidoListView(BaseListView):
     model = DetallePedido
-    template_name = 'panel_admin/lista.html'
-    context_object_name = 'objetos'
-    paginate_by = 8 
+    model_name = "detallepedido"
+    campos = ['id', 'pedido', 'proventa', 'cantidad', 'precio']
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['campos'] = ['id', 'pedido', 'proventa', 'cantidad', 'precio']
-        context['model_name'] = "detallepedido"
-        return context
-
-class PagoListView(LoginRequiredMixin, ListView):
-    login_url = '/panel_admin/login/'
+class PagoListView(BaseListView):
     model = Pago
-    template_name = 'panel_admin/lista.html'
-    context_object_name = 'objetos'
-    paginate_by = 8 
+    model_name = "Pagos"
+    campos = ['id', 'pedido', 'monto', 'metodo_pago', 'estado']
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['campos'] = ['id', 'pedido', 'monto', 'metodo_pago', 'estado']
-        context['model_name'] = "Pagos"
-        return context
-
-class HistorialListView(LoginRequiredMixin, ListView):
-    login_url = '/panel_admin/login/'
+class HistorialListView(BaseListView):
     model = Historial
-    template_name = 'panel_admin/lista.html'
-    context_object_name = 'objetos'
-    paginate_by = 8 
+    model_name = "Historiales"
+    campos = ['id', 'empleado', 'pedido', 'detalle', 'fecha']
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['campos'] = ['id', 'empleado', 'pedido', 'detalle', 'fecha']
-        context['model_name'] = "Historial"
-        return context
-
-
-
-class ClienteListView(LoginRequiredMixin, ListView):
-    login_url = '/panel_admin/login/'
+class ClienteListView(BaseListView):
     model = Cliente
-    template_name = 'panel_admin/lista.html'
-    context_object_name = 'objetos'
-    paginate_by = 8 
+    model_name = "Clientes"
+    campos = ['id', 'usuario', 'correo', 'telefono']
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['campos'] = ['id', 'usuario', 'correo', 'telefono']
-        context['model_name'] = "Clientes"
-        return context
-
-
-class RepertorioListView(LoginRequiredMixin, ListView):
-    login_url = '/panel_admin/login/'
+class RepertorioListView(BaseListView):
     model = Repertorio
-    template_name = 'panel_admin/lista.html'
-    context_object_name = 'objetos'
-    paginate_by = 8 
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['campos'] = ['id', 'titulo', 'descripcion', 'precio', 'fecha_inic', 'fecha_fin', 'imagen']
-        context['model_name'] = "Repertorios"
-        return context
-
+    model_name = "Repertorios"
+    campos = ['id', 'titulo', 'descripcion', 'precio', 'fecha_inic', 'fecha_fin', 'imagen']
 
 ################################
 class ModelFactory:
@@ -461,12 +451,12 @@ class ModelFactory:
         'productosventa': (ProductoVenta, ProductoVentaForm),
         'productosprima': (ProductoPrima, ProductoPrimaForm),
         'paquetes': (Paquete, PaqueteForm),
-        'pedidos': (Pedido,PedidoForm),
+        'pedidos': (Pedido, PedidoForm),
         'detallepedido': (DetallePedido, DetallePedidoForm),
-        'pagos': (PagoListView, PagoForm),
-        'historial': (HistorialListView, HistorialForm),
-        'clientes': (ClienteListView, ClienteForm),
-        'repertorios' : (RepertorioListView, RepertorioForm),
+        'pagos': (Pago, PagoForm),
+        'historiales': (Historial, HistorialForm),
+        'clientes': (Cliente, ClienteForm),
+        'repertorios' : (Repertorio, RepertorioForm),
         'usuarioadmins': (UsuarioAdmin, UsuarioAdminForm),
     }
 

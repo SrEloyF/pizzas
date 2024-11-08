@@ -71,7 +71,7 @@ class Cliente(models.Model):
     contrasena = models.CharField(max_length=80)
 
     def __str__(self):
-        return f"{self.nombre} {self.apellido}"
+        return f"{self.usuario} - {self.correo}"
 
 class Sucursal(models.Model):
     telefono = models.IntegerField()
@@ -86,7 +86,7 @@ class Pedido(models.Model):
     sucursal = models.ForeignKey(Sucursal, on_delete=models.PROTECT)
     cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
     fecha_pedido = models.DateTimeField()
-    fecha_entrega = models.DateField()
+    fecha_entrega = models.DateTimeField()
     estado = models.CharField(max_length=45)
     nombre_ref = models.CharField(max_length=45)
     correo = models.CharField(max_length=85)

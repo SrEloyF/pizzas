@@ -3,17 +3,17 @@
 {% block titulo %}Admin - Sucursales{% endblock %}
 
 {% block contenido %}
-<div class="row h-50 my-3 mx-0">
-    <div class="col-9 h-100">
-        <div class="box h-100 d-flex flex-column">
+<div class="row custom-height mx-0 py-2">
+    <div class="col-lg-9 col-12 pt-3">
+        <div class="box d-flex flex-column h-100">
             <h3 class="text-center py-3 px-1">Ventas por sucursal</h3>
-            <div id="graficoLinealVentasAnio" class="flex-grow-1"></div>
+            <div id="graficoLinealVentasAnio" class="flex-grow-1 overflow-auto contenedor-grafico"></div>
         </div>
     </div>
 
-    <div class="col-3 h-100">
-        <div class="box h-100 d-flex flex-column">
-            <h3 class="text-center py-3 px-1">Clientes por sucursal</h3>   
+    <div class="col-lg-3 col-12 pt-3">
+        <div class="box d-flex flex-column justify-content-center h-100">
+            <h3 class="text-center py-3 px-1">Clientes por sucursal</h3>
             <div class="flex-grow-1 px-4">
                 {% if data_clientes_sucursal %}
                     {% for d_cliente in data_clientes_sucursal %}
@@ -27,23 +27,20 @@
                     <h4 class="text-center">Sin datos</h4>
                 {% endif %}
             </div>
-
         </div>
     </div>
 </div>
 
-<div class="row h-50 my-2 mx-0">
-
-    <div class="col-3 h-100">
-        <div class="box h-100 d-flex flex-column">
+<div class="row custom-height mx-0 py-2">
+    <div class="col-lg-3 col-md-4 col-sm-6 col-12 pt-3">
+        <div class="box d-flex flex-column h-100">
             <h3 class="text-center py-3 px-1">Empleados por sucursal</h3>
-            
             <div class="flex-grow-1 px-4">
                 {% if data_empleados_sucursal %}
                     {% for d_empleado in data_empleados_sucursal %}
                         <div class="d-flex justify-content-between">
                             <h4>{{ d_empleado.0 }}</h4>
-                            <h4>{{ .1 }}</h4>
+                            <h4>{{ d_empleado.1 }}</h4>
                         </div>
                         <hr class="m-1">
                     {% endfor %}
@@ -54,8 +51,8 @@
         </div>
     </div>
 
-    <div class="col-3 h-100">
-        <div class="box h-100 d-flex flex-column">
+    <div class="col-lg-3 col-md-4 col-sm-6 col-12 pt-3">
+        <div class="box d-flex flex-column h-100">
             <h3 class="text-center py-3 px-1">Ganancias promedio por sucursal</h3>
             <div class="flex-grow-1 d-flex justify-content-center align-items-center contenedor-texto">
                 <p class="color-numero">{{ ganancias_promedio_sucursal }}</p>
@@ -63,8 +60,8 @@
         </div>
     </div>
 
-    <div class="col-3 h-100">
-        <div class="box h-100 d-flex flex-column">
+    <div class="col-lg-3 col-md-4 col-sm-6 col-12 pt-3">
+        <div class="box d-flex flex-column h-100">
             <h3 class="text-center py-3 px-1">Pedidos promedio por sucursal</h3>
             <div class="flex-grow-1 d-flex justify-content-center align-items-center contenedor-texto">
                 <p class="color-numero">{{ pedidos_promedio_sucursal }}</p>
@@ -72,5 +69,6 @@
         </div>
     </div>
 </div>
+
 
 {% endblock %}

@@ -41,8 +41,8 @@ class RepertorioForm(BaseForm):
         model = Repertorio
         fields = ['titulo', 'descripcion', 'precio', 'fecha_inic', 'fecha_fin', 'imagen']
         widgets = {
-            'fecha_inic': forms.DateTimeInput(attrs={
-                'type': 'datetime-local',
+            'fecha_inic': forms.DateInput(attrs={
+                'type': 'date',
                 'class': 'form-control',
             }),
             'fecha_fin': forms.DateInput(attrs={
@@ -76,8 +76,8 @@ class PedidoForm(BaseForm):
                 'type': 'datetime-local',
                 'class': 'form-control',
             }),
-            'fecha_entrega': forms.DateInput(attrs={
-                'type': 'date',
+            'fecha_entrega': forms.DateTimeInput(attrs={
+                'type': 'datetime-local',
                 'class': 'form-control',
             }),
             'correo': forms.EmailInput(attrs={'class': 'form-control'}),
@@ -117,5 +117,10 @@ class UsuarioAdminForm(BaseForm):
             'password': forms.PasswordInput(attrs={'class': 'form-control'}),
         }
 
-        
-
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        if self.cleaned_data['password']:
+            user.set_password(self.cleaned_data['password'])
+        if commit:
+            user.save()
+        return user

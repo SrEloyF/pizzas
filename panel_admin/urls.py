@@ -20,10 +20,10 @@ urlpatterns = [
     path('usuarioadmins_lista/', UsuarioAdminListView.as_view(), name='usuarioadmins_lista'),
     path('pedidos_lista/', PedidoListView.as_view(), name='pedidos_lista'),
     path('detallepedido/', DetallePedidoListView.as_view(), name='detallepedido_lista'),
-    path('pago_lista/', PagoListView.as_view(), name='pago_lista'),
+    path('pagos_lista/', PagoListView.as_view(), name='pagos_lista'),
     path('historial_lista/', HistorialListView.as_view(), name='historial_lista'),
-    path('cliente_lista/', ClienteListView.as_view(), name='cliente_lista'),
-    path('repertorio_lista/', RepertorioListView.as_view(), name='repertorio_lista'),
+    path('cliente_lista/', ClienteListView.as_view(), name='clientes_lista'),
+    path('repertorio_lista/', RepertorioListView.as_view(), name='repertorios_lista'),
 
     path('crear/<str:model_name>/', CrearObjetoView.as_view(), name='crear_objeto'),
     path('editar/<str:model_name>/<int:pk>/', EditarObjetoView.as_view(), name='editar_objeto'),
