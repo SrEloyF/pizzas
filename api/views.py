@@ -1,6 +1,8 @@
 from rest_framework import generics
 from .models import *
 from .serializers import *
+from rest_framework.response import Response
+from rest_framework import status
 
 class ListCreateView(generics.ListCreateAPIView):
     serializer_class = None
@@ -16,8 +18,17 @@ class AreaListCreate(ListCreateView):
 class CategoriaListCreate(ListCreateView):
     serializer_class = CategoriaSerializer
 
-class ClienteListCreate(ListCreateView):
+class ClienteListCreateUpdate(generics.ListCreateAPIView):
+    queryset = Cliente.objects.all()
     serializer_class = ClienteSerializer
+
+    def put(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class SucursalListCreate(ListCreateView):
     serializer_class = SucursalSerializer
