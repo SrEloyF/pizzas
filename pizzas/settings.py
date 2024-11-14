@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-2yaw$glzp$*6ka0g_z4hk(v1!tc^x&qjty3t@-=(h7b%_ef4vw
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['Elote.pythonanywhere.com']
 
 
 
@@ -114,10 +114,10 @@ WSGI_APPLICATION = 'pizzas.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'pizzas',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': 'localhost',
+        'NAME': 'Elote$default',
+        'USER': 'Elote',
+        'PASSWORD': 'Wasd_1234',
+        'HOST': 'Elote.mysql.pythonanywhere-services.com',
         'PORT': '3306',
     }
 }
