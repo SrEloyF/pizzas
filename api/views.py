@@ -69,27 +69,27 @@ class RepertorioListCreate(ListCreateView):
     serializer_class = RepertorioSerializer
 
 
-class EncryptPasswordView(APIView):
-    def post(self, request):
-        password = request.data.get("password")
-        if not password:
-            return Response({"error": "Password not provided"}, status=status.HTTP_400_BAD_REQUEST)
-        hashed_password = make_password(password)
-        return Response({"hashed_password": hashed_password}, status=status.HTTP_200_OK)
+# class EncryptPasswordView(APIView):
+#     def post(self, request):
+#         password = request.data.get("password")
+#         if not password:
+#             return Response({"error": "Password not provided"}, status=status.HTTP_400_BAD_REQUEST)
+#         hashed_password = make_password(password)
+#         return Response({"hashed_password": hashed_password}, status=status.HTTP_200_OK)
 
-class CheckPasswordView(APIView):
-    def post(self, request):
-        password = request.data.get("password")
-        hashed_password = request.data.get("hashed_password")
+# class CheckPasswordView(APIView):
+#     def post(self, request):
+#         password = request.data.get("password")
+#         hashed_password = request.data.get("hashed_password")
         
-        if not password or not hashed_password:
-            return Response({"error": "Password or hash not provided"}, status=status.HTTP_400_BAD_REQUEST)
-        password_is_correct = check_password(password, hashed_password)
+#         if not password or not hashed_password:
+#             return Response({"error": "Password or hash not provided"}, status=status.HTTP_400_BAD_REQUEST)
+#         password_is_correct = check_password(password, hashed_password)
         
-        if password_is_correct:
-            return Response({"message": "Password is correct"}, status=status.HTTP_200_OK)
-        else:
-            return Response({"message": "Password is incorrect"}, status=status.HTTP_400_BAD_REQUEST)
+#         if password_is_correct:
+#             return Response({"message": "Password is correct"}, status=status.HTTP_200_OK)
+#         else:
+#             return Response({"message": "Password is incorrect"}, status=status.HTTP_400_BAD_REQUEST)
         
 class RegistroView(APIView):
     def post(self, request):
@@ -123,11 +123,11 @@ class RegistroView(APIView):
 
 class LoginView(APIView):
     def post(self, request):
-        usuario = request.data.get('USUARIO')
-        contrasena = request.data.get('CONTRASENA')
+        usuario = request.data.get('usuario')
+        contrasena = request.data.get('contrasena')
         
         try:
-            cliente = Cliente.objects.get(USUARIO=usuario)
+            cliente = Cliente.objects.get(usuario=usuario)
         except Cliente.DoesNotExist:
             return Response({'detail': 'Usuario no encontrado'}, status=status.HTTP_404_NOT_FOUND)
         
