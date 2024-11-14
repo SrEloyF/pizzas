@@ -10,6 +10,13 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from django.contrib.auth.hashers import check_password, make_password
 from django.contrib.auth.models import *
 
+def get_tokens_for_user(cliente):
+    refresh = RefreshToken.for_user(cliente)
+    return {
+        'refresh': str(refresh),
+        'access': str(refresh.access_token),
+    }
+
 class ListCreateView(generics.ListCreateAPIView):
     serializer_class = None
     queryset = None
@@ -189,9 +196,3 @@ class RefreshTokenView(TokenRefreshView):
         else:
             return Response({"detail": "Refresh token not found"}, status=status.HTTP_400_BAD_REQUEST)
 
-def get_tokens_for_user(cliente):
-    refresh = RefreshToken.for_user(cliente)
-    return {
-        'refresh': str(refresh),
-        'access': str(refresh.access_token),
-    }
