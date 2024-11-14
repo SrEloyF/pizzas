@@ -33,7 +33,7 @@ def vista_admin_ventas(request):
         .filter(fecha_pedido__gte=hace_12_meses)
         .annotate(mes=TruncMonth('fecha_pedido'))
         .values('mes')
-        .annotate(total_ventas=Count('id'))
+        .annotate(total_ventas=Count('id_pedido'))
         .order_by('mes')
     )
     data_ventas = []
@@ -42,14 +42,14 @@ def vista_admin_ventas(request):
         data_ventas.append(total)
 
     #metodos pagos
-    metodos_pago = Pago.objects.values('metodo_pago').annotate(cantidad=Count('id'))
+    metodos_pago = Pago.objects.values('metodo_pago').annotate(cantidad=Count('id_pago'))
     data_pagos = [[pago['metodo_pago'], pago['cantidad']] for pago in metodos_pago]
 
     #top dias
     top_dias = Pedido.objects \
         .annotate(dia=TruncDay('fecha_pedido')) \
         .values('dia') \
-        .annotate(total_ventas=Count('id')) \
+        .annotate(total_ventas=Count('id_pedido')) \
         .order_by('-total_ventas')[:4]
 
     top_dias_data = [{"dia": dia['dia'].strftime('%A'), "total_ventas": dia['total_ventas']} for dia in top_dias]
@@ -58,7 +58,7 @@ def vista_admin_ventas(request):
     top_horas = Pedido.objects \
         .annotate(hora=TruncHour('fecha_pedido')) \
         .values('hora') \
-        .annotate(total_ventas=Count('id')) \
+        .annotate(total_ventas=Count('id_pedido')) \
         .order_by('-total_ventas')[:4]
 
     top_horas_data = [{"hora": hora['hora'].strftime('%H:%M'), "total_ventas": hora['total_ventas']} for hora in top_horas]
@@ -66,7 +66,7 @@ def vista_admin_ventas(request):
     # Ingresos del mes actual
     inicio_mes = timezone.now().replace(day=1)
     fin_mes = inicio_mes + timedelta(days=31)
-    ingresos_mes = Pago.objects.filter(pedido__fecha_pedido__range=(inicio_mes, fin_mes)).aggregate(Sum('monto'))['monto__sum'] or 0
+    ingresos_mes = Pago.objects.filter(id_pedido__fecha_pedido__range=(inicio_mes, fin_mes)).aggregate(Sum('monto'))['monto__sum'] or 0
     ingresos_mes = round(ingresos_mes, 2)
 
     # Costo promedio de venta
@@ -91,7 +91,7 @@ def vista_admin_clientes(request):
         Pedido.objects.filter(
             fecha_pedido__year=hoy.year if hoy.month >= mes else hoy.year - 1,
             fecha_pedido__month=mes
-        ).values('cliente').distinct().count()
+        ).values('id_cliente').distinct().count()  # Cambiado 'cliente' por 'id_cliente'
         for mes in range(1, 13)
     ]
     
@@ -126,7 +126,6 @@ def vista_admin_clientes(request):
         'clientes_nuevos_mes': clientes_nuevos_mes,
         'clientes_mas_frecuentes': list(clientes_mas_frecuentes)
     })
-    
 
 @login_required(login_url='/panel_admin/login/')
 def vista_admin_empleados(request):
@@ -134,21 +133,28 @@ def vista_admin_empleados(request):
 
     # 1. Empleados con más ventas en los últimos 12 meses
     data_empleados_mas_ventas_query = (
-        Empleado.objects.annotate(
-            total_pedidos=Count('historial__pedido'),
-            nombre_completo=Concat('nombre', Value(' '), 'apellido')  # Concatenar nombre y apellido
+        Historial.objects
+        .filter(id_pedido__fecha_pedido__gte=hoy.replace(year=hoy.year - 1))
+        .values('id_empleado__nombre', 'id_empleado__apellido')
+        .annotate(
+            total_pedidos=Count('id_pedido'),
+            nombre_completo=Concat('id_empleado__nombre', Value(' '), 'id_empleado__apellido')
         )
         .order_by('-total_pedidos')[:12]
-        .values_list('nombre_completo', 'total_pedidos')  # Seleccionar el nombre completo y total_pedidos
+        .values_list('nombre_completo', 'total_pedidos')
     )
 
-    # Convertir el QuerySet en la estructura deseada
-    data_empleados_mas_ventas = [[nombre_completo, total_pedidos] for nombre_completo, total_pedidos in data_empleados_mas_ventas_query]
+    data_empleados_mas_ventas = [
+        [nombre_completo, total_pedidos] for nombre_completo, total_pedidos in data_empleados_mas_ventas_query
+    ]
+
     # 2. Empleados que han generado más ingresos en todo el tiempo
     empleados_mas_ingresos = (
-        Empleado.objects.annotate(total_ingresos=Sum('historial__pedido__pago__monto'))
+        Historial.objects
+        .values('id_empleado__nombre')
+        .annotate(total_ingresos=Sum('id_pedido__pago__monto'))
         .order_by('-total_ingresos')[:4]
-        .values_list('nombre', 'total_ingresos')
+        .values_list('id_empleado__nombre', 'total_ingresos')
     )
 
     empleados_mas_ingresos = [
@@ -158,22 +164,22 @@ def vista_admin_empleados(request):
     
     # 3. Empleados más eficaces (menor tiempo entre fecha_pedido y fecha_entrega)
     empleados_mas_eficaces_query = (
-        Empleado.objects.annotate(
+        Historial.objects
+        .annotate(
             tiempo_entrega=ExpressionWrapper(
-                F('historial__pedido__fecha_entrega') - F('historial__pedido__fecha_pedido'),
+                F('id_pedido__fecha_entrega') - F('id_pedido__fecha_pedido'),
                 output_field=DurationField()
             )
         )
-        .values('nombre', 'apellido')
+        .values('id_empleado__nombre', 'id_empleado__apellido')
         .annotate(
             promedio_tiempo=Avg('tiempo_entrega'),
-            nombre_completo=Concat('nombre', Value(' '), 'apellido')
+            nombre_completo=Concat('id_empleado__nombre', Value(' '), 'id_empleado__apellido')
         )
         .order_by('promedio_tiempo')[:4]
         .values_list('nombre_completo', 'promedio_tiempo')
     )
 
-    # Convertir el QuerySet en la estructura deseada, en segundos
     empleados_mas_eficaces = [
         [
             nombre_completo, 
@@ -189,56 +195,38 @@ def vista_admin_empleados(request):
     ]
     
     # 5. Ventas promedio por empleado
-    """
-    ventas_promedio_por_empleado = (
-        Historial.objects
-        .values('empleado')  # Agrupar por empleado
-        .annotate(
-            total_ventas=Sum(
-                F('pedido__detallepedido__cantidad') * F('pedido__detallepedido__precio')
-            )  # Sumar el total de ventas a través de los detalles del pedido
-        )
-        .aggregate(
-            promedio_ventas=Sum('total_ventas') / Count('empleado')  # Calcular el promedio de ventas por empleado
-        )['promedio_ventas'] or 0  # Si no hay resultados, devolver 0
-    )
-    """
-    ventas_promedio_por_empleado = 1.2
+    ventas_promedio_por_empleado = 1.2  # Está definido para pruebas, déjalo así
 
-    # 6. Tiempo promedio entre pedidos.fecha_pedido y pedidos.fecha_entrega en segundos
+    # 6. Tiempo promedio entre pedidos.fecha_pedido y pedidos.fecha_entrega en horas
     tiempo_promedio_pedido = (
         Pedido.objects.annotate(
             tiempo=ExpressionWrapper(
                 F('fecha_entrega') - F('fecha_pedido'),
-                output_field=DurationField()  # Calcula la diferencia como un DurationField
+                output_field=DurationField() 
             )
         )
         .aggregate(
             total_tiempo=Sum('tiempo'),
-            total_pedidos=Count('id')
+            total_pedidos=Count('id_pedido')
         )
     )
 
-    # Realiza la división en Python para obtener el promedio en horas
     if tiempo_promedio_pedido['total_tiempo'] and tiempo_promedio_pedido['total_pedidos']:
         promedio_segundos = tiempo_promedio_pedido['total_tiempo'].total_seconds()
         tiempo_promedio_pedido = (promedio_segundos / 3600) / tiempo_promedio_pedido['total_pedidos']
         tiempo_promedio_pedido = round(tiempo_promedio_pedido, 2)
     else:
-        tiempo_promedio_pedido = 0  # Si no hay datos, establecer a 0
-
-
-
+        tiempo_promedio_pedido = 0
 
     return render(request, 'panel_admin/admin_empleados.html', {
-        'meses': json.dumps(meses),
-        'data_empleados_mas_ventas': json.dumps(list(data_empleados_mas_ventas)),
+        'data_empleados_mas_ventas': json.dumps(data_empleados_mas_ventas),
         'empleados_mas_ingresos': list(empleados_mas_ingresos),
         'empleados_mas_eficaces': list(empleados_mas_eficaces),
         'ventas_promedio_por_empleado': ventas_promedio_por_empleado,
         'tiempo_promedio_pedido': tiempo_promedio_pedido,
         'estado_empleados': estado_empleados
     })
+
 
 @login_required(login_url='/panel_admin/login/')
 def vista_admin_sucursales(request):

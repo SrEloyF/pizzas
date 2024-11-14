@@ -12,7 +12,8 @@ from .models import (
     DetallePedido,
     Paquete,
     Empleado,
-    Historial
+    Historial,
+    Repertorio
 )
 
 @admin.register(UsuarioAdmin)
@@ -47,13 +48,13 @@ class PagoAdmin(admin.ModelAdmin):
 
 @admin.register(Pedido)
 class PedidoAdmin(admin.ModelAdmin):
-    list_display = ('cliente', 'sucursal', 'fecha_pedido', 'estado')
+    list_display = ('id_cliente', 'id_sucursal', 'fecha_pedido', 'estado')
     search_fields = ('nombre_ref', 'correo', 'direccion')
 
 @admin.register(ProductoVenta)
 class ProductoVentaAdmin(admin.ModelAdmin):
-    list_display = ('repertorio', 'fecha_venta', 'estado')
-    search_fields = ('id',)
+    list_display = ('id_repertorio', 'fecha_venta', 'estado')
+    search_fields = ('id_proventa',)
 
 @admin.register(ProductoPrima)
 class ProductoPrimaAdmin(admin.ModelAdmin):
@@ -62,13 +63,13 @@ class ProductoPrimaAdmin(admin.ModelAdmin):
 
 @admin.register(DetallePedido)
 class DetallePedidoAdmin(admin.ModelAdmin):
-    list_display = ('pedido', 'proventa', 'cantidad', 'precio')
-    search_fields = ('pedido__pk',)
+    list_display = ('id_pedido', 'id_proventa', 'cantidad', 'precio')
+    search_fields = ('pedido__id_pedido',)
 
 @admin.register(Paquete)
 class PaqueteAdmin(admin.ModelAdmin):
-    list_display = ('proventa', 'proprima')
-    search_fields = ('proventa__nombre',)
+    list_display = ('id_proventa', 'id_proprima')
+    search_fields = ('proventa__id_proventa',)
 
 @admin.register(Empleado)
 class EmpleadoAdmin(admin.ModelAdmin):
@@ -77,6 +78,10 @@ class EmpleadoAdmin(admin.ModelAdmin):
 
 @admin.register(Historial)
 class HistorialAdmin(admin.ModelAdmin):
-    list_display = ('empleado', 'pedido', 'detalle', 'fecha')
+    list_display = ('id_empleado', 'id_pedido', 'detalle', 'fecha')
     search_fields = ('detalle',)
 
+@admin.register(Repertorio)
+class RepertirioAdmin(admin.ModelAdmin):
+    list_display = ('id_repertorio', 'titulo', 'descripcion', 'precio' ,'fecha_inic', 'fecha_fin', 'imagen')
+    search_fields = ('titulo',)

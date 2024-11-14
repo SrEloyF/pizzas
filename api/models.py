@@ -51,29 +51,42 @@ class UsuarioAdmin(AbstractBaseUser, PermissionsMixin):
         return True
 
 class Area(models.Model):
+    id_area = models.AutoField(primary_key=True)
     nombre_area = models.CharField(max_length=45)
     descripcion = models.CharField(max_length=45)
 
     def __str__(self):
-        return self.nombre_area
+        return  self.nombre_area
+    
+    class Meta:
+        db_table = 'AREAS'
 
 class Categoria(models.Model):
+    id_categoria = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=45)
     descripcion = models.CharField(max_length=70)
 
     def __str__(self):
         return self.nombre
+    
+    class Meta:
+        db_table = 'CATEGORIAS'
 
 class Cliente(models.Model):
+    id_cliente = models.AutoField(primary_key=True)
     usuario = models.CharField(max_length=45)
-    correo = models.EmailField(max_length=50)
+    correo = models.EmailField(max_length=50, unique=True)
     telefono = models.IntegerField()
-    contrasena = models.CharField(max_length=80)
+    contrasena = models.CharField(max_length=255)
 
     def __str__(self):
         return f"{self.usuario} - {self.correo}"
+    
+    class Meta:
+        db_table = 'CLIENTES'
 
 class Sucursal(models.Model):
+    id_sucursal = models.AutoField(primary_key=True)
     telefono = models.IntegerField()
     direccion = models.CharField(max_length=45)
     hora_inicio = models.TimeField()
@@ -81,10 +94,14 @@ class Sucursal(models.Model):
 
     def __str__(self):
         return self.direccion
+    
+    class Meta:
+        db_table = 'SUCURSALES'
 
 class Pedido(models.Model):
-    sucursal = models.ForeignKey(Sucursal, on_delete=models.PROTECT)
-    cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
+    id_pedido = models.AutoField(primary_key=True)
+    id_sucursal = models.ForeignKey(Sucursal, db_column='id_sucursal',on_delete=models.PROTECT)
+    id_cliente = models.ForeignKey(Cliente, db_column='id_cliente',on_delete=models.PROTECT)
     fecha_pedido = models.DateTimeField()
     fecha_entrega = models.DateTimeField()
     estado = models.CharField(max_length=45)
@@ -92,81 +109,125 @@ class Pedido(models.Model):
     correo = models.CharField(max_length=85)
     direccion = models.CharField(max_length=85)
 
+    class Meta:
+        db_table = 'PEDIDOS'
+        unique_together = (('id_pedido', 'id_sucursal'),)
+
     def __str__(self):
-        return f"Pedido {self.pk} - {self.estado}"
+        return f"Pedido {self.id_pedido} - {self.estado}"
     
 class Pago(models.Model):
-    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
+    id_pago = models.AutoField(primary_key=True)
+    id_pedido = models.ForeignKey(Pedido, db_column='id_pedido', on_delete=models.PROTECT)
     monto = models.DecimalField(max_digits=10, decimal_places=2)
     metodo_pago = models.CharField(max_length=45)
     estado = models.CharField(max_length=45)
 
+    class Meta:
+        db_table = 'PAGOS'
+        unique_together = (('id_pago', 'id_pedido'),)
+
     def __str__(self):
-        return f"Pago {self.pk} - {self.estado}"
+        return f"Pago {self.id_pago} - {self.estado}"
 
 class Repertorio(models.Model):
+    id_repertorio = models.AutoField(primary_key=True)
     titulo = models.CharField(max_length=60)
     descripcion = models.CharField(max_length=120)
-    precio = models.DecimalField(max_digits=10, decimal_places=2)
+    precio = models.DecimalField(max_digits=10, decimal_places=5)
     fecha_inic = models.DateField()
     fecha_fin = models.DateField()
     imagen = models.ImageField(upload_to='repertorio/', null=True, blank=True)
 
-class ProductoVenta(models.Model):
-    repertorio = models.ForeignKey(Repertorio, on_delete= models.PROTECT)
-    fecha_venta = models.DateField()
-    estado = models.CharField(max_length=30)
+    class Meta:
+        db_table = 'REPERTORIOS'
 
     def __str__(self):
-        return f"Prod Venta {self.repertorio} - {self.fecha_venta} - {self.estado}"
+        return f"{self.id_repertorio} - {self.titulo}"
+
+class ProductoVenta(models.Model):
+    id_proventa = models.AutoField(primary_key=True)
+    id_repertorio = models.ForeignKey(Repertorio, db_column='id_repertorio', on_delete= models.PROTECT)
+    fecha_venta = models.DateField()
+    estado = models.CharField(max_length=45)
+
+    class Meta:
+        db_table = 'PRODUCTOS_VENTA'
+
+    def __str__(self):
+        return f"Prod Venta {self.id_proventa} - {self.fecha_venta} - {self.estado}"
 
 class ProductoPrima(models.Model):
-    categoria = models.ForeignKey(Categoria, on_delete=models.PROTECT)
+    id_proprima = models.AutoField(primary_key=True)
+    id_categoria = models.ForeignKey(Categoria, db_column='id_categoria',on_delete=models.PROTECT)
     nombre = models.CharField(max_length=45)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     descripcion = models.CharField(max_length=100)
     stock = models.PositiveIntegerField()
 
+    class Meta:
+        db_table = 'PRODUCTOS_PRIMA'
+        unique_together = (('id_proprima', 'id_categoria'),)
+
     def __str__(self):
         return self.nombre
 
 class DetallePedido(models.Model):
-    pedido = models.ForeignKey(Pedido, on_delete=models.PROTECT)
-    proventa = models.ForeignKey(ProductoVenta, on_delete=models.PROTECT)
+    id_detalle = models.AutoField(primary_key=True)
+    id_pedido = models.ForeignKey(Pedido, db_column='id_pedido',on_delete=models.PROTECT)
+    id_proventa = models.ForeignKey(ProductoVenta, db_column='id_proventa', on_delete=models.PROTECT)
     cantidad = models.IntegerField()
     precio = models.DecimalField(max_digits=10, decimal_places=2)
 
+    class Meta:
+        db_table = 'DETALLES_PEDIDO'
+        unique_together = (('id_detalle', 'id_pedido', 'id_proventa'),)
+
     def __str__(self):
-        return f"Detalle {self.pk} - Pedido {self.pedido.pk}"
+        return f"Detalle {self.id_detalle} - Pedido {self.id_pedido}"
 
 class Paquete(models.Model):
-    proventa = models.ForeignKey(ProductoVenta, on_delete=models.PROTECT)
-    proprima = models.ForeignKey(ProductoPrima, on_delete=models.PROTECT)
+    id_paquete = models.AutoField(primary_key=True)
+    id_proventa = models.ForeignKey(ProductoVenta, db_column='id_proventa',on_delete=models.PROTECT)
+    id_proprima = models.ForeignKey(ProductoPrima, db_column='id_proprima', on_delete=models.PROTECT)
+
+    class Meta:
+        db_table = 'PAQUETES'
+        unique_together = (('id_paquete', 'id_proventa', 'id_proprima'),)
 
     def __str__(self):
-        return f"Paquete {self.pk}"
+        return f"Paquete {self.id_paquete}"
 
 class Empleado(models.Model):
     ESTADO_CHOICES = [
         ('disponible', 'Disponible'),
         ('no_disponible', 'No Disponible'),
     ]
-
-    sucursal = models.ForeignKey(Sucursal, on_delete=models.PROTECT)
-    area = models.ForeignKey(Area, on_delete=models.PROTECT)
+    id_empleado = models.AutoField(primary_key=True)
+    id_sucursal = models.ForeignKey(Sucursal, db_column='id_sucursal',on_delete=models.PROTECT)
+    id_area = models.ForeignKey(Area, db_column='id_area',on_delete=models.PROTECT)
     nombre = models.CharField(max_length=45)
     apellido = models.CharField(max_length=45)
     cargo = models.CharField(max_length=45)
-    estado = models.CharField(max_length=15, choices=ESTADO_CHOICES, default='disponible')
+    estado = models.CharField(max_length=25, choices=ESTADO_CHOICES, default='disponible')
+
+    class Meta:
+        db_table = 'EMPLEADOS'
+        unique_together = (('id_empleado', 'id_sucursal', 'id_area'),)
 
     def __str__(self):
         return f"{self.nombre} {self.apellido}"
 
 class Historial(models.Model):
-    empleado = models.ForeignKey(Empleado, on_delete=models.PROTECT)
-    pedido = models.ForeignKey(Pedido, on_delete=models.PROTECT)
+    id_historial = models.AutoField(primary_key=True)
+    id_empleado = models.ForeignKey(Empleado, db_column='id_empleado',on_delete=models.PROTECT)
+    id_pedido = models.ForeignKey(Pedido, db_column='id_pedido', on_delete=models.PROTECT)
     detalle = models.CharField(max_length=45)
     fecha = models.DateField()
 
+    class Meta:
+        db_table = 'HISTORIAL'
+        unique_together = (('id_historial', 'id_empleado', 'id_pedido'),)
+
     def __str__(self):
-        return f"Historial {self.pk} - Pedido {self.pedido.pk}"
+        return f"Historial {self.id_historial} - Pedido {self.id_pedido}"

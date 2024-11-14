@@ -29,12 +29,12 @@ class SucursalForm(BaseForm):
 class EmpleadoForm(BaseForm):
     class Meta:
         model = Empleado
-        fields = ['sucursal', 'area', 'nombre', 'apellido', 'cargo', 'estado']
+        fields = ['id_sucursal', 'id_area', 'nombre', 'apellido', 'cargo', 'estado']
 
 class ProductoVentaForm(BaseForm):
     class Meta:
         model = ProductoVenta
-        fields = ['repertorio','fecha_venta', 'estado']
+        fields = ['id_repertorio','fecha_venta', 'estado']
 
 class RepertorioForm(BaseForm):
     class Meta:
@@ -59,18 +59,18 @@ class RepertorioForm(BaseForm):
 class ProductoPrimaForm(BaseForm):
     class Meta:
         model = ProductoPrima
-        fields = ['categoria', 'nombre', 'precio', 'descripcion', 'stock']
+        fields = ['id_categoria', 'nombre', 'precio', 'descripcion', 'stock']
 
 
 class PaqueteForm(BaseForm):
     class Meta:
         model = Paquete
-        fields = ['proventa', 'proprima']
+        fields = ['id_proventa', 'id_proprima']
 
 class PedidoForm(BaseForm):
     class Meta:
         model = Pedido
-        fields = ['sucursal', 'cliente', 'fecha_pedido', 'fecha_entrega', 'estado', 'nombre_ref', 'correo', 'direccion']
+        fields = ['id_sucursal', 'id_cliente', 'fecha_pedido', 'fecha_entrega', 'estado', 'nombre_ref', 'correo', 'direccion']
         widgets = {
             'fecha_pedido': forms.DateTimeInput(attrs={
                 'type': 'datetime-local',
@@ -86,17 +86,17 @@ class PedidoForm(BaseForm):
 class DetallePedidoForm(BaseForm):
     class Meta:
         model = DetallePedido
-        fields = ['pedido', 'proventa', 'cantidad', 'precio']
+        fields = ['id_pedido', 'id_proventa', 'cantidad', 'precio']
 
 class PagoForm(BaseForm):
     class Meta:
         model = Pago
-        fields = ['pedido', 'monto', 'metodo_pago', 'estado']
+        fields = ['id_pedido', 'monto', 'metodo_pago', 'estado']
 
 class HistorialForm(BaseForm):
     class Meta:
         model = Historial
-        fields = ['empleado', 'pedido', 'detalle', 'fecha']
+        fields = ['id_empleado', 'id_pedido', 'detalle', 'fecha']
         widgets = {
             'fecha': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
         }
