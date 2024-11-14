@@ -32,7 +32,7 @@ class UsuarioAdmin(AbstractBaseUser, PermissionsMixin):
         ('otro', 'Otro'),
     ]
 
-    usuario = models.CharField(max_length=50, unique=True)
+    usuario = models.CharField(max_length=1024, unique=True)
     rol = models.CharField(max_length=10, choices=ROL_CHOICES)
     is_staff = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
