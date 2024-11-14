@@ -367,67 +367,67 @@ class UsuarioAdminListView(BaseListView):
 class AreaListView(BaseListView):
     model = Area
     model_name = "Areas"
-    campos = ['id', 'nombre_area', 'descripcion']
+    campos = ['id_area', 'nombre_area', 'descripcion']
 
 class CategoriaListView(BaseListView):
     model = Categoria
     model_name = "Categorias"
-    campos = ['id', 'nombre', 'descripcion']
+    campos = ['id_categoria', 'nombre', 'descripcion']
 
 class SucursalListView(BaseListView):
     model = Sucursal
     model_name = "Sucursales"
-    campos = ['id', 'telefono', 'direccion', 'hora_inicio', 'hora_cierre']
+    campos = ['id_sucursal', 'telefono', 'direccion', 'hora_inicio', 'hora_cierre']
 
 class EmpleadoListView(BaseListView):
     model = Empleado
     model_name = "Empleados"
-    campos = ['id', 'sucursal', 'area', 'nombre', 'apellido', 'cargo', 'estado']
+    campos = ['id_empleado', 'sucursal', 'area', 'nombre', 'apellido', 'cargo', 'estado']
 
 class ProductoVentaListView(BaseListView):
     model = ProductoVenta
     model_name = "ProductosVenta"
-    campos = ['id', 'repertorio','fecha_venta', 'estado']
+    campos = ['id_proventa', 'repertorio','fecha_venta', 'estado']
 
 class ProductoPrimaListView(BaseListView):
     model = ProductoPrima
     model_name = "ProductosPrima"
-    campos = ['id', 'categoria', 'nombre', 'precio', 'descripcion', 'stock']
+    campos = ['id_proprima', 'categoria', 'nombre', 'precio', 'descripcion', 'stock']
 
 class PaqueteListView(BaseListView):
     model = Paquete
     model_name = "Paquetes"
-    campos = ['id', 'proventa', 'proprima']
+    campos = ['id_paquete', 'proventa', 'proprima']
 
 class PedidoListView(BaseListView):
     model = Pedido
     model_name = "Pedidos"
-    campos = ['id', 'sucursal', 'cliente', 'fecha_pedido', 'fecha_entrega', 'estado', 'nombre_ref', 'correo', 'direccion']
+    campos = ['id_pedido', 'sucursal', 'cliente', 'fecha_pedido', 'fecha_entrega', 'estado', 'nombre_ref', 'correo', 'direccion']
 
 class DetallePedidoListView(BaseListView):
     model = DetallePedido
     model_name = "detallepedido"
-    campos = ['id', 'pedido', 'proventa', 'cantidad', 'precio']
+    campos = ['id_detalle', 'pedido', 'proventa', 'cantidad', 'precio']
 
 class PagoListView(BaseListView):
     model = Pago
     model_name = "Pagos"
-    campos = ['id', 'pedido', 'monto', 'metodo_pago', 'estado']
+    campos = ['id_pago', 'pedido', 'monto', 'metodo_pago', 'estado']
 
 class HistorialListView(BaseListView):
     model = Historial
     model_name = "Historiales"
-    campos = ['id', 'empleado', 'pedido', 'detalle', 'fecha']
+    campos = ['id_historial', 'empleado', 'pedido', 'detalle', 'fecha']
 
 class ClienteListView(BaseListView):
     model = Cliente
     model_name = "Clientes"
-    campos = ['id', 'usuario', 'correo', 'telefono']
+    campos = ['id_cliente', 'usuario', 'correo', 'telefono']
 
 class RepertorioListView(BaseListView):
     model = Repertorio
     model_name = "Repertorios"
-    campos = ['id', 'titulo', 'descripcion', 'precio', 'fecha_inic', 'fecha_fin', 'imagen']
+    campos = ['id_repertorio', 'titulo', 'descripcion', 'precio', 'fecha_inic', 'fecha_fin', 'imagen']
 
 ################################
 class ModelFactory:

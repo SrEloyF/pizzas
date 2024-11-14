@@ -17,7 +17,7 @@ class ClienteSerializer(serializers.ModelSerializer):
         fields = '__all__'
     
     def create(self, validated_data):
-        validated_data['CONTRASENA'] = make_password(validated_data['CONTRASENA'])
+        validated_data['contrasena'] = make_password(validated_data['contrasena'])
         return super(ClienteSerializer, self).create(validated_data)
 
 class SucursalSerializer(serializers.ModelSerializer):
