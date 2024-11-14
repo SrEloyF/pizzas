@@ -85,7 +85,11 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'AUTH_HEADER_TYPES': ('Bearer',),
+<<<<<<< HEAD
+    'USER_ID_FIELD': 'id_cliente',
+=======
     # 'USER_ID_FIELD': 'id_cliente',
+>>>>>>> 911cb326e3d475ed491df10f9342a8b5a241912b
     'USER_ID_CLAIM': 'user_id',
 }
 
@@ -114,10 +118,10 @@ WSGI_APPLICATION = 'pizzas.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'pizzas',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': 'localhost',
+        'NAME': 'Elote$default',
+        'USER': 'Elote',
+        'PASSWORD': 'Wasd_1234',
+        'HOST': 'Elote.mysql.pythonanywhere-services.com',
         'PORT': '3306',
     }
 }
