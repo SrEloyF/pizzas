@@ -32,8 +32,8 @@ class UsuarioAdmin(AbstractBaseUser, PermissionsMixin):
         ('otro', 'Otro'),
     ]
 
-    usuario = models.CharField(max_length=50, unique=True)
-    rol = models.CharField(max_length=10, choices=ROL_CHOICES)
+    usuario = models.TextField(max_length=50, unique=True)
+    rol = models.TextField(max_length=10, choices=ROL_CHOICES)
     is_staff = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
 
@@ -52,43 +52,43 @@ class UsuarioAdmin(AbstractBaseUser, PermissionsMixin):
 
 class Area(models.Model):
     id_area = models.AutoField(primary_key=True)
-    nombre_area = models.CharField(max_length=45)
-    descripcion = models.CharField(max_length=45)
+    nombre_area = models.TextField(max_length=45)
+    descripcion = models.TextField(max_length=300)
 
     def __str__(self):
         return  self.nombre_area
     
     class Meta:
-        db_table = 'AREAS'
+        db_table = 'areas'
 
 class Categoria(models.Model):
     id_categoria = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=45)
-    descripcion = models.CharField(max_length=70)
+    nombre = models.TextField(max_length=45)
+    descripcion = models.TextField(max_length=300)
 
     def __str__(self):
         return self.nombre
     
     class Meta:
-        db_table = 'CATEGORIAS'
+        db_table = 'categorias'
 
 class Cliente(models.Model):
     id_cliente = models.AutoField(primary_key=True)
-    usuario = models.CharField(max_length=45)
+    usuario = models.TextField(max_length=45)
     correo = models.EmailField(max_length=50, unique=True)
     telefono = models.IntegerField()
-    contrasena = models.CharField(max_length=255)
+    contrasena = models.TextField(max_length=255)
 
     def __str__(self):
         return f"{self.usuario} - {self.correo}"
     
     class Meta:
-        db_table = 'CLIENTES'
+        db_table = 'clientes'
 
 class Sucursal(models.Model):
     id_sucursal = models.AutoField(primary_key=True)
     telefono = models.IntegerField()
-    direccion = models.CharField(max_length=45)
+    direccion = models.TextField(max_length=45)
     hora_inicio = models.TimeField()
     hora_cierre = models.TimeField()
 
@@ -96,7 +96,7 @@ class Sucursal(models.Model):
         return self.direccion
     
     class Meta:
-        db_table = 'SUCURSALES'
+        db_table = 'sucursales'
 
 class Pedido(models.Model):
     id_pedido = models.AutoField(primary_key=True)
@@ -104,13 +104,13 @@ class Pedido(models.Model):
     id_cliente = models.ForeignKey(Cliente, db_column='id_cliente',on_delete=models.PROTECT)
     fecha_pedido = models.DateTimeField()
     fecha_entrega = models.DateTimeField()
-    estado = models.CharField(max_length=45)
-    nombre_ref = models.CharField(max_length=45)
-    correo = models.CharField(max_length=85)
-    direccion = models.CharField(max_length=85)
+    estado = models.TextField(max_length=45)
+    nombre_ref = models.TextField(max_length=45)
+    correo = models.TextField(max_length=85)
+    direccion = models.TextField(max_length=85)
 
     class Meta:
-        db_table = 'PEDIDOS'
+        db_table = 'pedidos'
         unique_together = (('id_pedido', 'id_sucursal'),)
 
     def __str__(self):
@@ -120,11 +120,11 @@ class Pago(models.Model):
     id_pago = models.AutoField(primary_key=True)
     id_pedido = models.ForeignKey(Pedido, db_column='id_pedido', on_delete=models.PROTECT)
     monto = models.DecimalField(max_digits=10, decimal_places=2)
-    metodo_pago = models.CharField(max_length=45)
-    estado = models.CharField(max_length=45)
+    metodo_pago = models.TextField(max_length=45)
+    estado = models.TextField(max_length=45)
 
     class Meta:
-        db_table = 'PAGOS'
+        db_table = 'pagos'
         unique_together = (('id_pago', 'id_pedido'),)
 
     def __str__(self):
@@ -132,15 +132,15 @@ class Pago(models.Model):
 
 class Repertorio(models.Model):
     id_repertorio = models.AutoField(primary_key=True)
-    titulo = models.CharField(max_length=60)
-    descripcion = models.CharField(max_length=120)
+    titulo = models.TextField(max_length=60)
+    descripcion = models.TextField(max_length=300)
     precio = models.DecimalField(max_digits=10, decimal_places=5)
     fecha_inic = models.DateField()
     fecha_fin = models.DateField()
     imagen = models.ImageField(upload_to='repertorio/', null=True, blank=True)
 
     class Meta:
-        db_table = 'REPERTORIOS'
+        db_table = 'repertorios'
 
     def __str__(self):
         return f"{self.id_repertorio} - {self.titulo}"
@@ -149,10 +149,10 @@ class ProductoVenta(models.Model):
     id_proventa = models.AutoField(primary_key=True)
     id_repertorio = models.ForeignKey(Repertorio, db_column='id_repertorio', on_delete= models.PROTECT)
     fecha_venta = models.DateField()
-    estado = models.CharField(max_length=45)
+    estado = models.TextField(max_length=45)
 
     class Meta:
-        db_table = 'PRODUCTOS_VENTA'
+        db_table = 'productos_venta'
 
     def __str__(self):
         return f"Prod Venta {self.id_proventa} - {self.fecha_venta} - {self.estado}"
@@ -160,13 +160,13 @@ class ProductoVenta(models.Model):
 class ProductoPrima(models.Model):
     id_proprima = models.AutoField(primary_key=True)
     id_categoria = models.ForeignKey(Categoria, db_column='id_categoria',on_delete=models.PROTECT)
-    nombre = models.CharField(max_length=45)
+    nombre = models.TextField(max_length=45)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
-    descripcion = models.CharField(max_length=100)
+    descripcion = models.TextField(max_length=300)
     stock = models.PositiveIntegerField()
 
     class Meta:
-        db_table = 'PRODUCTOS_PRIMA'
+        db_table = 'productos_prima'
         unique_together = (('id_proprima', 'id_categoria'),)
 
     def __str__(self):
@@ -180,7 +180,7 @@ class DetallePedido(models.Model):
     precio = models.DecimalField(max_digits=10, decimal_places=2)
 
     class Meta:
-        db_table = 'DETALLES_PEDIDO'
+        db_table = 'detalles_pedido'
         unique_together = (('id_detalle', 'id_pedido', 'id_proventa'),)
 
     def __str__(self):
@@ -192,7 +192,7 @@ class Paquete(models.Model):
     id_proprima = models.ForeignKey(ProductoPrima, db_column='id_proprima', on_delete=models.PROTECT)
 
     class Meta:
-        db_table = 'PAQUETES'
+        db_table = 'paquetes'
         unique_together = (('id_paquete', 'id_proventa', 'id_proprima'),)
 
     def __str__(self):
@@ -206,13 +206,13 @@ class Empleado(models.Model):
     id_empleado = models.AutoField(primary_key=True)
     id_sucursal = models.ForeignKey(Sucursal, db_column='id_sucursal',on_delete=models.PROTECT)
     id_area = models.ForeignKey(Area, db_column='id_area',on_delete=models.PROTECT)
-    nombre = models.CharField(max_length=45)
-    apellido = models.CharField(max_length=45)
-    cargo = models.CharField(max_length=45)
-    estado = models.CharField(max_length=25, choices=ESTADO_CHOICES, default='disponible')
+    nombre = models.TextField(max_length=45)
+    apellido = models.TextField(max_length=45)
+    cargo = models.TextField(max_length=45)
+    estado = models.TextField(max_length=25, choices=ESTADO_CHOICES, default='disponible')
 
     class Meta:
-        db_table = 'EMPLEADOS'
+        db_table = 'empleados'
         unique_together = (('id_empleado', 'id_sucursal', 'id_area'),)
 
     def __str__(self):
@@ -222,11 +222,11 @@ class Historial(models.Model):
     id_historial = models.AutoField(primary_key=True)
     id_empleado = models.ForeignKey(Empleado, db_column='id_empleado',on_delete=models.PROTECT)
     id_pedido = models.ForeignKey(Pedido, db_column='id_pedido', on_delete=models.PROTECT)
-    detalle = models.CharField(max_length=45)
+    detalle = models.TextField(max_length=45)
     fecha = models.DateField()
 
     class Meta:
-        db_table = 'HISTORIAL'
+        db_table = 'historial'
         unique_together = (('id_historial', 'id_empleado', 'id_pedido'),)
 
     def __str__(self):
