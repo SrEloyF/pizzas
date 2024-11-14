@@ -20,8 +20,8 @@ urlpatterns = [
     path('empleados/', EmpleadoListCreate.as_view(), name='empleados'),
     path('historiales/', HistorialListCreate.as_view(), name='historiales'),
 
-    path('enpass/', EncryptPasswordView.as_view(), name='pass'),
-    path('checkhash/', CheckPasswordView.as_view(), name='hash'),
+    #path('enpass/', EncryptPasswordView.as_view(), name='pass'),
+    #path('checkhash/', CheckPasswordView.as_view(), name='hash'),
     path('registro/', RegistroView.as_view(), name='registro'),
     path('login/', LoginView.as_view(), name='login'),
     path('refresh/', RefreshTokenView.as_view(), name='refresh'),
