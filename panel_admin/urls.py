@@ -8,7 +8,7 @@ urlpatterns = [
     path('clientes/', vista_admin_clientes, name='admin_clientes'),
     path('sucursales/', vista_admin_sucursales, name='admin_surcursales'),
     path('productosprima/', vista_admin_pprima, name='admin_productosprima'),
-    path('productosventa/', vista_admin_pventa, name='admin_productosventa'),
+    #path('productosventa/', vista_admin_pventa, name='admin_productosventa'),
 
     path('categorias_lista/', CategoriaListView.as_view(), name='categorias_lista'),
     path('sucursales_lista/', SucursalListView.as_view(), name='sucursales_lista'),
