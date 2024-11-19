@@ -121,23 +121,14 @@
                 </li>
 
                 <li class="sidebar-item">
-                    <a href="#"
+                    <a href="{% url 'productosventa_lista' %}"
                         class="sidebar-link collapsed has-dropdown {% if 'productosventa' in request.path %}active{% endif %}"
-                        data-bs-toggle="collapse" data-bs-target="#productos-venta" aria-expanded="false"
-                        aria-controls="productos-venta" data-tooltip="Productos Venta">
+                        data-tooltip="Productos Venta">
                         <i class="fa-solid fa-pizza-slice"></i>
                         <span>Productos Venta</span>
                     </a>
-
-                    <ul id="productos-venta" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
-                        <li class="sidebar-item">
-                            <a href="{% url 'admin_productosventa' %}" class="sidebar-link">Info Productos Venta</a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a href="{% url 'productosventa_lista' %}" class="sidebar-link">Crud Productos Venta</a>
-                        </li>
-                    </ul>
                 </li>
+
                 <li class="sidebar-item">
                     <a href="{% url 'categorias_lista' %}"
                         class="sidebar-link {% if 'categoria' in request.path %}active{% endif %}"

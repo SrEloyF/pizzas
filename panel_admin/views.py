@@ -230,69 +230,89 @@ def vista_admin_empleados(request):
 
 @login_required(login_url='/panel_admin/login/')
 def vista_admin_sucursales(request):
+    data_ventas_sucursal = list(
+        Pedido.objects.values('id_sucursal__direccion')
+        .annotate(total_ventas=Count('id_pedido'))
+        .order_by('-total_ventas')
+        .values_list('id_sucursal__direccion', 'total_ventas')
+    )
 
-    data_clientes_sucursal = [
-        ["Sucursal 1", 1],
-        ["Sucursal 11", 81],
-        ["Sucursal 2", 2],
-        ["Sucursal 3", 3],
-    ]
+    data_clientes_sucursal = list(
+        Pedido.objects.values('id_sucursal__direccion')
+        .annotate(total_clientes=Count('id_cliente', distinct=True))
+        .order_by('-total_clientes')
+        .values_list('id_sucursal__direccion', 'total_clientes')
+    )
 
-    data_empleados_sucursal = [
-        ["Sucursal 9", 1],
-        ["Sucursal 5", 2],
-        ["Sucursal 6", 3],
-    ]
+    data_empleados_sucursal = list(
+        Empleado.objects.filter(estado='disponible')
+        .values('id_sucursal__direccion')
+        .annotate(total_empleados=Count('id_empleado'))
+        .order_by('-total_empleados')
+        .values_list('id_sucursal__direccion', 'total_empleados')
+    )
 
-    ganancias_promedio_sucursal = 349
-    pedidos_promedio_sucursal = 4
+    ganancias_promedio_sucursal = Pago.objects.aggregate(promedio_ganancias=Avg('monto'))['promedio_ganancias'] or 0
 
-    return render(request, 'panel_admin/admin_sucursales.html',{
-        'meses': json.dumps(meses),
+    pedidos_promedio_sucursal = Pedido.objects.aggregate(promedio_pedidos=Avg('id_pedido'))['promedio_pedidos'] or 0
+
+    return render(request, 'panel_admin/admin_sucursales.html', {
+        'data_ventas_sucursal': data_ventas_sucursal,
         'data_clientes_sucursal': data_clientes_sucursal,
         'data_empleados_sucursal': data_empleados_sucursal,
-        'ganancias_promedio_sucursal': ganancias_promedio_sucursal,
-        'pedidos_promedio_sucursal': pedidos_promedio_sucursal,
+        'ganancias_promedio_sucursal': round(ganancias_promedio_sucursal, 2),
+        'pedidos_promedio_sucursal': round(pedidos_promedio_sucursal, 2),
     })
 
 @login_required(login_url='/panel_admin/login/')
 def vista_admin_pprima(request):
-    costo_total_inventario = 326
-    precio_promedio_prod_prima = 42
+    costo_total_inventario = ProductoPrima.objects.aggregate(
+        total_inventario=Sum('precio', field="precio * stock")
+    )['total_inventario'] or 0
 
-    prod_prima_mas_vendidos = [
-        ["Producto prima 1", 1],
-        ["Producto prima 2", 2],
-        ["Producto prima 3", 3],
-    ]
+    precio_promedio_prod_prima = ProductoPrima.objects.aggregate(
+        promedio_precio=Avg('precio')
+    )['promedio_precio'] or 0
 
-    prod_prima_menos_vendidos = [
-        ["Producto prima 4", 1],
-        ["Producto prima 5", 2],
-        ["Producto prima 6", 3],
-    ]
+    prod_prima_mas_vendidos = list(
+        Paquete.objects.values('id_proprima__nombre')
+        .annotate(total_vendido=Sum('id_proventa__detallepedido__cantidad'))
+        .order_by('-total_vendido')[:4]
+        .values_list('id_proprima__nombre', 'total_vendido')
+    )
 
-    prod_prima_bajo_stock = [
-        ["Producto prima 7", 1],
-        ["Producto prima 8", 2],
-        ["Producto prima 9", 3],
-    ]
+    prod_prima_menos_vendidos = list(
+        Paquete.objects.values('id_proprima__nombre')
+        .annotate(total_vendido=Sum('id_proventa__detallepedido__cantidad'))
+        .order_by('total_vendido')[:4]
+        .values_list('id_proprima__nombre', 'total_vendido')
+    )
 
-    categorias_mas_vendidas = [
-        ["Categoría 1", 1],
-        ["Categoría 2", 2],
-        ["Categoría 3", 3],
-    ]
+    prod_prima_bajo_stock = list(
+        ProductoPrima.objects.values('nombre')
+        .annotate(stock_actual=Sum('stock'))
+        .order_by('stock_actual')[:4]
+        .values_list('nombre', 'stock_actual')
+    )
 
-    return render(request, 'panel_admin/admin_pprima.html',{
-        'costo_total_inventario': costo_total_inventario,
-        'precio_promedio_prod_prima': precio_promedio_prod_prima,
+    categorias_mas_vendidas = list(
+        Paquete.objects.values('id_proprima__id_categoria__nombre')
+        .annotate(total_vendido=Sum('id_proventa__detallepedido__cantidad'))
+        .order_by('-total_vendido')[:4]
+        .values_list('id_proprima__id_categoria__nombre', 'total_vendido')
+    )
+
+    # Renderizar datos al template
+    return render(request, 'panel_admin/admin_pprima.html', {
+        'costo_total_inventario': round(costo_total_inventario, 2),
+        'precio_promedio_prod_prima': round(precio_promedio_prod_prima, 2),
         'prod_prima_mas_vendidos': prod_prima_mas_vendidos,
         'prod_prima_menos_vendidos': prod_prima_menos_vendidos,
         'prod_prima_bajo_stock': prod_prima_bajo_stock,
         'categorias_mas_vendidas': categorias_mas_vendidas
     })
 
+#ya no va
 @login_required(login_url='/panel_admin/login/')
 def vista_admin_pventa(request):
     costo_total_inventario = 326
