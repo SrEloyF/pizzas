@@ -74,7 +74,7 @@ class Categoria(models.Model):
 
 class Cliente(models.Model):
     id_cliente = models.AutoField(primary_key=True)
-    usuario = models.CharField(max_length=45)
+    usuario = models.CharField(max_length=45, unique=True)
     correo = models.EmailField(max_length=50, unique=True)
     telefono = models.IntegerField()
     contrasena = models.CharField(max_length=255)
