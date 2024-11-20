@@ -39,7 +39,7 @@ class ProductoVentaForm(BaseForm):
 class RepertorioForm(BaseForm):
     class Meta:
         model = Repertorio
-        fields = ['titulo', 'descripcion', 'precio', 'fecha_inic', 'fecha_fin', 'imagen']
+        fields = ['titulo', 'descripcion', 'precio', 'fecha_inic', 'fecha_fin', 'tipo_repertorio', 'imagen']
         widgets = {
             'fecha_inic': forms.DateInput(attrs={
                 'type': 'date',

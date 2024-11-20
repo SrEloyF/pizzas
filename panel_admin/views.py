@@ -447,7 +447,7 @@ class ClienteListView(BaseListView):
 class RepertorioListView(BaseListView):
     model = Repertorio
     model_name = "Repertorios"
-    campos = ['id_repertorio', 'titulo', 'descripcion', 'precio', 'fecha_inic', 'fecha_fin', 'imagen']
+    campos = ['id_repertorio', 'titulo', 'descripcion', 'precio', 'fecha_inic', 'fecha_fin', 'tipo_repertorio', 'imagen']
 
 ################################
 class ModelFactory:

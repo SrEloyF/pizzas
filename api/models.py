@@ -137,6 +137,7 @@ class Repertorio(models.Model):
     precio = models.DecimalField(max_digits=10, decimal_places=5)
     fecha_inic = models.DateField()
     fecha_fin = models.DateField()
+    tipo_repertorio = models.CharField(max_length=100)
     imagen = models.ImageField(upload_to='repertorio/', null=True, blank=True)
 
     class Meta:
