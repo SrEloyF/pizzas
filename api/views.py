@@ -30,7 +30,7 @@ class SolicitarRecuperacionContrasena(APIView):
             return Response({"error": "Cliente no encontrado."}, status=status.HTTP_404_NOT_FOUND)
         
         token = cliente_token_generator.make_token(cliente)
-        recovery_link = f"{settings.SITE_URL}/clientes/restablecer-contrasena/{cliente.id_cliente}/{token}/"
+        recovery_link = f"{settings.SITE_URL}/api/restablecer-contrasena/{cliente.id_cliente}/{token}/"
         
         subject = "Recuperación de contraseña"
         html_content = f"""
