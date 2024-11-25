@@ -15,6 +15,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
 from django.core.mail import send_mail
 from .utils import cliente_token_generator
+from django.shortcuts import render
 
 class SolicitarRecuperacionContrasena(APIView):
     def post(self, request):
@@ -52,26 +53,35 @@ class SolicitarRecuperacionContrasena(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class RestablecerContrasena(APIView):
-    def post(self, request, cliente_id, token, *args, **kwargs):
+    def get(self, request, cliente_id, token):
         try:
-            # Obtener al cliente por su id
             cliente = Cliente.objects.get(id_cliente=cliente_id)
         except Cliente.DoesNotExist:
             return Response({"error": "Cliente no encontrado."}, status=404)
-        
-        # Verificar si el token es válido
         if not default_token_generator.check_token(cliente, token):
             return Response({"error": "El enlace de recuperación es inválido o ha caducado."}, status=400)
-        
-        # Validar y restablecer la contraseña
-        serializer = RestablecerContrasenaSerializer(data=request.data)
-        if serializer.is_valid():
-            cliente.contrasena = make_password(serializer.validated_data['contrasena'])
-            cliente.save()
-            return Response({"message": "Contraseña restablecida exitosamente."}, status=200)
-        
-        return Response(serializer.errors, status=400)
+        return render(request, "api/restablecer_contrasena.html", {
+            'cliente_id': cliente_id,
+            'token': token
+        })
 
+    def post(self, request, cliente_id, token):
+        try:
+            cliente = Cliente.objects.get(id_cliente=cliente_id)
+        except Cliente.DoesNotExist:
+            return Response({"error": "Cliente no encontrado."}, status=404)
+        if not default_token_generator.check_token(cliente, token):
+            return Response({"error": "El enlace de recuperación es inválido o ha caducado."}, status=400)
+
+        nueva_contrasena = request.POST.get("password")
+        cliente.contrasena = make_password(nueva_contrasena)
+        cliente.save()
+
+        return render(request, "api/restablecer_contrasena.html", {
+            'cliente_id': cliente_id,
+            'token': token,
+            'success_message': "Contraseña actualizada"
+        })
 
 def get_tokens_for_user(cliente):
     refresh = RefreshToken.for_user(cliente)
