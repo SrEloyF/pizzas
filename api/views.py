@@ -35,8 +35,21 @@ class ClienteListCreateUpdate(generics.ListCreateAPIView):
     queryset = Cliente.objects.all()
     serializer_class = ClienteSerializer
 
-    def put(self, request):
-        return None
+    def put(self, request, *args, **kwargs):
+            cliente_id = request.data.get('id_cliente')
+            if not cliente_id:
+                return Response({"error": "El id_cliente es obligatorio."}, status=status.HTTP_400_BAD_REQUEST)
+            
+            try:
+                cliente = Cliente.objects.get(id_cliente=cliente_id)
+            except Cliente.DoesNotExist:
+                return Response({"error": "Cliente no encontrado."}, status=status.HTTP_404_NOT_FOUND)
+            
+            serializer = self.serializer_class(cliente, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class SucursalListCreate(ListCreateView):
     serializer_class = SucursalSerializer

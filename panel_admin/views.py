@@ -402,7 +402,7 @@ class SucursalListView(BaseListView):
 class EmpleadoListView(BaseListView):
     model = Empleado
     model_name = "Empleados"
-    campos = ['id_empleado', 'sucursal', 'area', 'nombre', 'apellido', 'cargo', 'estado']
+    campos = ['id_empleado', 'id_sucursal', 'id_area', 'nombre', 'apellido', 'cargo', 'estado']
 
 class ProductoVentaListView(BaseListView):
     model = ProductoVenta

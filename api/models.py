@@ -134,7 +134,7 @@ class Repertorio(models.Model):
     id_repertorio = models.AutoField(primary_key=True)
     titulo = models.CharField(max_length=60)
     descripcion = models.CharField(max_length=300)
-    precio = models.DecimalField(max_digits=10, decimal_places=5)
+    precio = models.DecimalField(max_digits=10, decimal_places=2)
     fecha_inic = models.DateField()
     fecha_fin = models.DateField()
     tipo_repertorio = models.CharField(max_length=100)

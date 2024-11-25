@@ -20,6 +20,11 @@ class ClienteSerializer(serializers.ModelSerializer):
         validated_data['contrasena'] = make_password(validated_data['contrasena'])
         return super(ClienteSerializer, self).create(validated_data)
 
+    def update(self, instance, validated_data):
+        if 'contrasena' in validated_data:
+            validated_data['contrasena'] = make_password(validated_data['contrasena'])
+        return super(ClienteSerializer, self).update(instance, validated_data)
+
 class SucursalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sucursal
