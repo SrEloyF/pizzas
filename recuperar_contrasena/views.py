@@ -24,7 +24,7 @@ class SolicitarRecuperacionContrasena(APIView):
             return Response({"error": "Cliente no encontrado."}, status=status.HTTP_404_NOT_FOUND)
         
         token = cliente_token_generator.make_token(cliente)
-        recovery_link = f"{settings.SITE_URL}/recuperar_contrasena/restablecer-contrasena/{cliente.id_cliente}/{token}/"
+        recovery_link = f"{settings.SITE_URL}/recovery/reset/{cliente.id_cliente}/{token}/"
         
         subject = "Recuperación de contraseña | Happy Pizza"
         html_content = f"""
@@ -57,7 +57,7 @@ class RestablecerContrasena(APIView):
             return Response({"error": "Cliente no encontrado."}, status=404)
         if not cliente_token_generator.check_token(cliente, token):
             return Response({"error": "El enlace de recuperación es inválido o ha caducado."}, status=400)
-        return render(request, "recuperar_contrasena/restablecer_contrasena.html", {
+        return render(request, "recovery/restablecer_contrasena.html", {
             'cliente_id': cliente_id,
             'token': token
         })
@@ -73,9 +73,8 @@ class RestablecerContrasena(APIView):
         nueva_contrasena = request.POST.get("password")
         cliente.contrasena = make_password(nueva_contrasena)
         cliente.save()
-        return render(request, "recuperar_contrasena/restablecer_contrasena.html", {
+        return render(request, "recovery/restablecer_contrasena.html", {
             'cliente_id': cliente_id,
             'token': token,
             'success_message': "Contraseña actualizada"
         })
-  

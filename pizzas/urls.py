@@ -24,6 +24,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
     path('panel_admin/', include('panel_admin.urls')),
-    path('recuperar_contrasena/', include('recuperar_contrasena.urls'))
+    path('recovery/', include('recuperar_contrasena.urls'))
     #path('', index, name=''),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
