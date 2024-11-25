@@ -53,6 +53,7 @@ LOGOUT_REDIRECT_URL = '/panel_admin/login/'
 INSTALLED_APPS = [
     'api',
     'panel_admin',
+    'recuperar_contrasena',
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',

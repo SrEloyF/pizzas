@@ -407,22 +407,22 @@ class EmpleadoListView(BaseListView):
 class ProductoVentaListView(BaseListView):
     model = ProductoVenta
     model_name = "ProductosVenta"
-    campos = ['id_proventa', 'repertorio','fecha_venta', 'estado']
+    campos = ['id_proventa', 'id_repertorio','fecha_venta', 'estado']
 
 class ProductoPrimaListView(BaseListView):
     model = ProductoPrima
     model_name = "ProductosPrima"
-    campos = ['id_proprima', 'categoria', 'nombre', 'precio', 'descripcion', 'stock']
+    campos = ['id_proprima', 'id_categoria', 'nombre', 'precio', 'descripcion', 'stock']
 
 class PaqueteListView(BaseListView):
     model = Paquete
     model_name = "Paquetes"
-    campos = ['id_paquete', 'proventa', 'proprima']
+    campos = ['id_paquete', 'id_proventa', 'id_proprima']
 
 class PedidoListView(BaseListView):
     model = Pedido
     model_name = "Pedidos"
-    campos = ['id_pedido', 'sucursal', 'cliente', 'fecha_pedido', 'fecha_entrega', 'estado', 'nombre_ref', 'correo', 'direccion']
+    campos = ['id_pedido', 'id_sucursal', 'id_cliente', 'fecha_pedido', 'fecha_entrega', 'estado', 'nombre_ref', 'correo', 'direccion']
 
 class DetallePedidoListView(BaseListView):
     model = DetallePedido
@@ -432,12 +432,12 @@ class DetallePedidoListView(BaseListView):
 class PagoListView(BaseListView):
     model = Pago
     model_name = "Pagos"
-    campos = ['id_pago', 'pedido', 'monto', 'metodo_pago', 'estado']
+    campos = ['id_pago', 'id_pedido', 'monto', 'metodo_pago', 'estado']
 
 class HistorialListView(BaseListView):
     model = Historial
     model_name = "Historiales"
-    campos = ['id_historial', 'empleado', 'pedido', 'detalle', 'fecha']
+    campos = ['id_historial', 'id_empleado', 'id_pedido', 'detalle', 'fecha']
 
 class ClienteListView(BaseListView):
     model = Cliente
