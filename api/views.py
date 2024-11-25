@@ -10,6 +10,65 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from django.contrib.auth.hashers import check_password, make_password
 from django.contrib.auth.models import *
 
+from django.http import JsonResponse
+from django.contrib.auth.tokens import default_token_generator
+from django.conf import settings
+from django.core.mail import send_mail
+
+import resend
+
+resend.api_key = "re_XXmfDkec_FUSXYwtybXvQR5PdZeAbrfUr"
+
+class SolicitarRecuperacionContrasena(APIView):
+    def post(self, request, *args, **kwargs):
+        correo = request.data.get('correo')
+        if not correo:
+            return JsonResponse({'error': 'Correo electrónico es obligatorio.'}, status=400)
+        try:
+            cliente = Cliente.objects.get(correo=correo)
+        except Cliente.DoesNotExist:
+            return JsonResponse({'error': 'Cliente con ese correo no encontrado.'}, status=404)
+        token = default_token_generator.make_token(cliente)
+        recovery_link = f"{settings.SITE_URL}/restablecer-contrasena/{cliente.id_cliente}/{token}/"
+        subject = "Recuperación de contraseña"
+        html_content = f"""
+        <p>Hola {cliente.usuario},</p>
+        <p>Hemos recibido una solicitud para restablecer la contraseña de tu cuenta.</p>
+        <p>Por favor, haz clic en el siguiente enlace para restablecer tu contraseña:</p>
+        <p><a href="{recovery_link}">Restablecer mi contraseña</a></p>
+        <p>Si no solicitaste este cambio, por favor ignora este mensaje.</p>
+        """
+        try:
+            r = resend.Emails.send({
+                "from": "fabrizioeloys@gmail.com",
+                "to": cliente.correo,
+                "subject": subject,
+                "html": html_content,
+            })
+            return JsonResponse({'message': 'Te hemos enviado un correo con instrucciones para restablecer tu contraseña.'})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+class RestablecerContrasenaSerializer(serializers.Serializer):
+    contrasena = serializers.CharField(write_only=True)
+
+class RestablecerContrasena(APIView):
+    def post(self, request, cliente_id, token, *args, **kwargs):
+        try:
+            cliente = Cliente.objects.get(id_cliente=cliente_id)
+        except Cliente.DoesNotExist:
+            return Response({"error": "Cliente no encontrado."}, status=404)
+        if not default_token_generator.check_token(cliente, token):
+            return Response({"error": "El enlace de recuperación es inválido o ha caducado."}, status=400)
+        serializer = RestablecerContrasenaSerializer(data=request.data)
+        if serializer.is_valid():
+            cliente.contrasena = make_password(serializer.validated_data['contrasena'])
+            cliente.save()
+            return Response({"message": "Contraseña restablecida exitosamente."}, status=200)
+        return Response(serializer.errors, status=400)
+
+
+
 def get_tokens_for_user(cliente):
     refresh = RefreshToken.for_user(cliente)
     return {

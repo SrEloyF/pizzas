@@ -108,6 +108,13 @@ class ClienteForm(BaseForm):
         widgets = {
             'contrasena': forms.PasswordInput(attrs={'class': 'form-control'}),
         }
+    
+    def save(self, commit=True):
+        cliente = super().save(commit=False)
+        cliente.contrasena = make_password(self.cleaned_data['contrasena'])
+        if commit:
+            cliente.save()
+        return cliente
 
 class UsuarioAdminForm(BaseForm):
     class Meta:
