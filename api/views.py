@@ -14,30 +14,32 @@ from django.http import JsonResponse
 from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
 from django.core.mail import send_mail
+from .utils import cliente_token_generator
 
 import resend
 
 resend.api_key = "re_XXmfDkec_FUSXYwtybXvQR5PdZeAbrfUr"
 
 class SolicitarRecuperacionContrasena(APIView):
-    def post(self, request, *args, **kwargs):
-        correo = request.data.get('correo')
+    def post(self, request):
+        correo = request.data.get("correo")
+        
         if not correo:
-            return JsonResponse({'error': 'Correo electrónico es obligatorio.'}, status=400)
+            return Response({"error": "El correo es obligatorio."}, status=status.HTTP_400_BAD_REQUEST)
+        
         try:
             cliente = Cliente.objects.get(correo=correo)
         except Cliente.DoesNotExist:
-            return JsonResponse({'error': 'Cliente con ese correo no encontrado.'}, status=404)
-        token = default_token_generator.make_token(cliente)
-        recovery_link = f"{settings.SITE_URL}/restablecer-contrasena/{cliente.id_cliente}/{token}/"
+            return Response({"error": "Cliente no encontrado."}, status=status.HTTP_404_NOT_FOUND)
+        token = cliente_token_generator.make_token(cliente)
+        recovery_link = f"{settings.SITE_URL}/clientes/restablecer-contrasena/{cliente.id_cliente}/{token}/"
         subject = "Recuperación de contraseña"
         html_content = f"""
         <p>Hola {cliente.usuario},</p>
-        <p>Hemos recibido una solicitud para restablecer la contraseña de tu cuenta.</p>
-        <p>Por favor, haz clic en el siguiente enlace para restablecer tu contraseña:</p>
-        <p><a href="{recovery_link}">Restablecer mi contraseña</a></p>
-        <p>Si no solicitaste este cambio, por favor ignora este mensaje.</p>
+        <p>Haga clic en el siguiente enlace para restablecer su contraseña:</p>
+        <a href="{recovery_link}">Restablecer mi contraseña</a>
         """
+        
         try:
             r = resend.Emails.send({
                 "from": "fabrizioeloys@gmail.com",
@@ -45,10 +47,10 @@ class SolicitarRecuperacionContrasena(APIView):
                 "subject": subject,
                 "html": html_content,
             })
-            return JsonResponse({'message': 'Te hemos enviado un correo con instrucciones para restablecer tu contraseña.'})
+            return Response({"message": "Correo de recuperación enviado."}, status=status.HTTP_200_OK)
         except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
-
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 class RestablecerContrasenaSerializer(serializers.Serializer):
     contrasena = serializers.CharField(write_only=True)
 
