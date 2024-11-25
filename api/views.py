@@ -27,19 +27,21 @@ class SolicitarRecuperacionContrasena(APIView):
             cliente = Cliente.objects.get(correo=correo)
         except Cliente.DoesNotExist:
             return Response({"error": "Cliente no encontrado."}, status=status.HTTP_404_NOT_FOUND)
-        token = default_token_generator.make_token(cliente)
+        
+        token = cliente_token_generator.make_token(cliente)
         recovery_link = f"{settings.SITE_URL}/clientes/restablecer-contrasena/{cliente.id_cliente}/{token}/"
+        
         subject = "Recuperación de contraseña"
         html_content = f"""
         <p>Hola {cliente.usuario},</p>
-        <p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p>
+        <p>Haga clic en el siguiente enlace para restablecer su contraseña:</p>
         <a href="{recovery_link}">Restablecer mi contraseña</a>
         """
         
         try:
             send_mail(
                 subject,
-                html_content,
+                '',
                 settings.EMAIL_HOST_USER,
                 [cliente.correo],
                 fail_silently=False,
@@ -48,7 +50,6 @@ class SolicitarRecuperacionContrasena(APIView):
             return Response({"message": "Correo de recuperación enviado."}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 class RestablecerContrasena(APIView):
     def post(self, request, cliente_id, token, *args, **kwargs):
