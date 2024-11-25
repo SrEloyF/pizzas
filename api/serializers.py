@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from .models import *
 
+class RestablecerContrasenaSerializer(serializers.Serializer):
+    contrasena = serializers.CharField(write_only=True)
+
 class AreaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Area

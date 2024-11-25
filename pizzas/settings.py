@@ -17,6 +17,13 @@ from django.conf import settings
 
 SITE_URL = 'https://elote.pythonanywhere.com'
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'fabrizioeloys@gmail.com'
+EMAIL_HOST_PASSWORD = 'zurfnsdmmjqscdtv'
+EMAIL_USE_TLS = True
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_URL = '/media/'
@@ -117,10 +124,10 @@ WSGI_APPLICATION = 'pizzas.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'Elote$default',
-        'USER': 'Elote',
-        'PASSWORD': 'Wasd_1234',
-        'HOST': 'Elote.mysql.pythonanywhere-services.com',
+        'NAME': 'pizzas',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': 'localhost',
         'PORT': '3306',
     }
 }
