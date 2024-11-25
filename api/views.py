@@ -63,7 +63,7 @@ class RestablecerContrasena(APIView):
             cliente = Cliente.objects.get(id_cliente=cliente_id)
         except Cliente.DoesNotExist:
             return Response({"error": "Cliente no encontrado."}, status=404)
-        if not default_token_generator.check_token(cliente, token):
+        if not cliente_token_generator.check_token(cliente, token):
             return Response({"error": "El enlace de recuperación es inválido o ha caducado."}, status=400)
         return render(request, "api/restablecer_contrasena.html", {
             'cliente_id': cliente_id,
@@ -75,7 +75,7 @@ class RestablecerContrasena(APIView):
             cliente = Cliente.objects.get(id_cliente=cliente_id)
         except Cliente.DoesNotExist:
             return Response({"error": "Cliente no encontrado."}, status=404)
-        if not default_token_generator.check_token(cliente, token):
+        if not cliente_token_generator.check_token(cliente, token):
             return Response({"error": "El enlace de recuperación es inválido o ha caducado."}, status=400)
 
         nueva_contrasena = request.POST.get("password")
@@ -86,7 +86,7 @@ class RestablecerContrasena(APIView):
             'token': token,
             'success_message': "Contraseña actualizada"
         })
-
+    
 def get_tokens_for_user(cliente):
     refresh = RefreshToken.for_user(cliente)
     return {
