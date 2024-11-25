@@ -42,7 +42,7 @@ class SolicitarRecuperacionContrasena(APIView):
         
         try:
             r = resend.Emails.send({
-                "from": "fabrizioeloys@gmail.com",
+                "from": "fabrizi.sanchez@tecsup.edu.pe",
                 "to": cliente.correo,
                 "subject": subject,
                 "html": html_content,
