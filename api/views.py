@@ -16,6 +16,8 @@ from django.conf import settings
 from django.core.mail import send_mail
 from .utils import cliente_token_generator
 from django.shortcuts import render
+from rest_framework.permissions import AllowAny
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 
 class SolicitarRecuperacionContrasena(APIView):
     def post(self, request):
@@ -53,6 +55,9 @@ class SolicitarRecuperacionContrasena(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class RestablecerContrasena(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [AllowAny]
+
     def get(self, request, cliente_id, token):
         try:
             cliente = Cliente.objects.get(id_cliente=cliente_id)
@@ -76,7 +81,6 @@ class RestablecerContrasena(APIView):
         nueva_contrasena = request.POST.get("password")
         cliente.contrasena = make_password(nueva_contrasena)
         cliente.save()
-
         return render(request, "api/restablecer_contrasena.html", {
             'cliente_id': cliente_id,
             'token': token,
