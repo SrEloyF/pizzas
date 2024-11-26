@@ -371,12 +371,22 @@ class BaseListView(LoginRequiredMixin, ListView):
     login_url = '/panel_admin/login/'
     template_name = 'panel_admin/lista.html'
     context_object_name = 'objetos'
-    paginate_by = 8
+    paginate_by = 7
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        campo = self.request.GET.get('campo')
+        valor = self.request.GET.get('valor')
+        if campo and valor:
+            filtro = {f"{campo}__icontains": valor}
+            queryset = queryset.filter(**filtro)
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['campos'] = self.campos
         context['model_name'] = self.model_name
+        context['request'] = self.request
         return context
 
 class UsuarioAdminListView(BaseListView):
