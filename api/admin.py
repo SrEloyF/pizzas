@@ -1,20 +1,5 @@
 from django.contrib import admin
-from .models import (
-    UsuarioAdmin,
-    Area,
-    Categoria,
-    Cliente,
-    Sucursal,
-    Pago,
-    Pedido,
-    ProductoVenta,
-    ProductoPrima,
-    DetallePedido,
-    Paquete,
-    Empleado,
-    Historial,
-    Repertorio
-)
+from .models import *
 
 @admin.register(UsuarioAdmin)
 class UsuarioAdminAdmin(admin.ModelAdmin):
@@ -85,3 +70,8 @@ class HistorialAdmin(admin.ModelAdmin):
 class RepertirioAdmin(admin.ModelAdmin):
     list_display = ('id_repertorio', 'titulo', 'descripcion', 'precio' ,'fecha_inic', 'fecha_fin', 'imagen')
     search_fields = ('titulo',)
+
+@admin.register(DetalleRepertorio)
+class DetalleRepertorioAdmin(admin.ModelAdmin):
+    list_display = ('id_detalle_repertorio', 'id_repertorio', 'producto', 'unidades', 'detalle')
+    search_fields = ('id_detalle_repertorio', 'producto')

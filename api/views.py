@@ -81,6 +81,8 @@ class HistorialListCreate(ListCreateView):
 class RepertorioListCreate(ListCreateView):
     serializer_class = RepertorioSerializer
 
+class DetalleRepertorioListCreate(ListCreateView):
+    serializer_class = DetalleRepertorioSerializer
 
 # class EncryptPasswordView(APIView):
 #     def post(self, request):

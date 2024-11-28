@@ -464,6 +464,11 @@ class RepertorioListView(BaseListView):
     model_name = "Repertorios"
     campos = ['id_repertorio', 'titulo', 'descripcion', 'precio', 'fecha_inic', 'fecha_fin', 'tipo_repertorio', 'imagen']
 
+class DetalleRepertorioListView(BaseListView):
+    model = DetalleRepertorio
+    model_name = "DetallesRepertorio"
+    campos = ['id_detalle_repertorio', 'id_repertorio', 'producto', 'unidades', 'detalle']
+
 ################################
 class ModelFactory:
     models_forms = {
@@ -481,6 +486,7 @@ class ModelFactory:
         'clientes': (Cliente, ClienteForm),
         'repertorios' : (Repertorio, RepertorioForm),
         'usuarioadmins': (UsuarioAdmin, UsuarioAdminForm),
+        'detallesrepertorio': (DetalleRepertorio, DetalleRepertorioForm)
     }
 
     @classmethod

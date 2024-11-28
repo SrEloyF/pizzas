@@ -19,6 +19,7 @@ urlpatterns = [
     path('paquetes/', PaqueteListCreate.as_view(), name='paquetes'),
     path('empleados/', EmpleadoListCreate.as_view(), name='empleados'),
     path('historiales/', HistorialListCreate.as_view(), name='historiales'),
+    path('detalles-repertorio/', DetalleRepertorioListCreate.as_view(), name='detalles-repertorio'),
 
     #path('enpass/', EncryptPasswordView.as_view(), name='pass'),
     #path('checkhash/', CheckPasswordView.as_view(), name='hash'),

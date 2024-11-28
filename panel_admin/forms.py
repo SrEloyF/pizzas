@@ -35,6 +35,12 @@ class ProductoVentaForm(BaseForm):
     class Meta:
         model = ProductoVenta
         fields = ['id_repertorio','fecha_venta', 'estado']
+        widgets = {
+            'fecha_venta': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'form-control',
+            }),
+        }
 
 class RepertorioForm(BaseForm):
     class Meta:
@@ -131,3 +137,8 @@ class UsuarioAdminForm(BaseForm):
         if commit:
             user.save()
         return user
+
+class DetalleRepertorioForm(BaseForm):
+    class Meta:
+        model = DetalleRepertorio
+        fields = ['id_repertorio', 'producto', 'unidades', 'detalle']

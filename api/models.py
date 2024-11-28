@@ -145,6 +145,19 @@ class Repertorio(models.Model):
 
     def __str__(self):
         return f"{self.id_repertorio} - {self.titulo}"
+    
+class DetalleRepertorio(models.Model):
+    id_detalle_repertorio = models.AutoField(primary_key=True)
+    id_repertorio = models.ForeignKey(Repertorio, db_column='id_repertorio', on_delete=models.PROTECT)
+    producto = models.CharField(max_length=100)
+    unidades = models.PositiveIntegerField()
+    detalle = models.CharField(max_length=200)
+
+    class Meta:
+        db_table = 'detalles_repertorio'
+    
+    def __str__(self):
+        return f"{self.id_detalle_repertorio} - {self.producto}"
 
 class ProductoVenta(models.Model):
     id_proventa = models.AutoField(primary_key=True)

@@ -77,3 +77,8 @@ class RepertorioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Repertorio
         fields = '__all__'
+
+class DetalleRepertorioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DetalleRepertorio
+        fields = '__all__'
