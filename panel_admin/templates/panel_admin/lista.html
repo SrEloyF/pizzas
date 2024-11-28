@@ -33,6 +33,13 @@
         </div>
         <button type="submit" class="btn btn-primary mt-auto">Filtrar</button>
     </form>
+
+    <p class="text-muted">
+        Cantidad de registros: {{ cantidad_filtrada }}
+        {% if cantidad_filtrada != cantidad_original %}
+            (de un total de {{ cantidad_original }})
+        {% endif %}
+    </p>  
     
 
     {% if page_obj %}
