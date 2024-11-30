@@ -190,7 +190,6 @@ class DetallePedido(models.Model):
     id_detalle = models.AutoField(primary_key=True)
     id_pedido = models.ForeignKey(Pedido, db_column='id_pedido',on_delete=models.PROTECT)
     id_proventa = models.ForeignKey(ProductoVenta, db_column='id_proventa', on_delete=models.PROTECT)
-    cantidad = models.IntegerField()
     precio = models.DecimalField(max_digits=10, decimal_places=2)
 
     class Meta:
@@ -245,3 +244,15 @@ class Historial(models.Model):
 
     def __str__(self):
         return f"Historial {self.id_historial} - Pedido {self.id_pedido}"
+    
+class Carrito(models.Model):
+    id_carrito = models.AutoField(primary_key=True)
+    id_cliente = models.ForeignKey(Cliente, db_column='id_cliente', on_delete=models.PROTECT)
+    id_proventa = models.ForeignKey(ProductoVenta, db_column='id_proventa', on_delete=models.PROTECT)
+    creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'carritos'
+    
+    def __str__(self):
+        return f"Carrito {self.id_carrito}, cliente {self.id_cliente}"

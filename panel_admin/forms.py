@@ -92,7 +92,7 @@ class PedidoForm(BaseForm):
 class DetallePedidoForm(BaseForm):
     class Meta:
         model = DetallePedido
-        fields = ['id_pedido', 'id_proventa', 'cantidad', 'precio']
+        fields = ['id_pedido', 'id_proventa', 'precio']
 
 class PagoForm(BaseForm):
     class Meta:
@@ -142,3 +142,8 @@ class DetalleRepertorioForm(BaseForm):
     class Meta:
         model = DetalleRepertorio
         fields = ['id_repertorio', 'producto', 'unidades', 'detalle']
+
+class CarritoForm(BaseForm):
+    class Meta:
+        model = Carrito
+        fields = ['id_cliente', 'id_proventa']

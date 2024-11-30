@@ -84,6 +84,9 @@ class RepertorioListCreate(ListCreateView):
 class DetalleRepertorioListCreate(ListCreateView):
     serializer_class = DetalleRepertorioSerializer
 
+class CarritoListCreate(ListCreateView):
+    serializer_class = CarritoSerializer
+
 # class EncryptPasswordView(APIView):
 #     def post(self, request):
 #         password = request.data.get("password")

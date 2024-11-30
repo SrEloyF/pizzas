@@ -82,3 +82,8 @@ class DetalleRepertorioSerializer(serializers.ModelSerializer):
     class Meta:
         model = DetalleRepertorio
         fields = '__all__'
+
+class CarritoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Carrito
+        fields = '__all__'

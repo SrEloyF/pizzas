@@ -48,7 +48,7 @@ class ProductoPrimaAdmin(admin.ModelAdmin):
 
 @admin.register(DetallePedido)
 class DetallePedidoAdmin(admin.ModelAdmin):
-    list_display = ('id_pedido', 'id_proventa', 'cantidad', 'precio')
+    list_display = ('id_pedido', 'id_proventa', 'precio')
     search_fields = ('pedido__id_pedido',)
 
 @admin.register(Paquete)
@@ -75,3 +75,8 @@ class RepertirioAdmin(admin.ModelAdmin):
 class DetalleRepertorioAdmin(admin.ModelAdmin):
     list_display = ('id_detalle_repertorio', 'id_repertorio', 'producto', 'unidades', 'detalle')
     search_fields = ('id_detalle_repertorio', 'producto')
+
+@admin.register(Carrito)
+class CarritoAdmin(admin.ModelAdmin):
+    list_display = ('id_carrito', 'id_cliente', 'id_proventa', 'creacion')
+    search_fields = ('id_carrito', 'id_cliente')

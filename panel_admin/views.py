@@ -442,7 +442,7 @@ class PedidoListView(BaseListView):
 class DetallePedidoListView(BaseListView):
     model = DetallePedido
     model_name = "detallepedido"
-    campos = ['id_detalle', 'pedido', 'proventa', 'cantidad', 'precio']
+    campos = ['id_detalle', 'pedido', 'proventa', 'precio']
 
 class PagoListView(BaseListView):
     model = Pago
@@ -469,6 +469,11 @@ class DetalleRepertorioListView(BaseListView):
     model_name = "DetallesRepertorio"
     campos = ['id_detalle_repertorio', 'id_repertorio', 'producto', 'unidades', 'detalle']
 
+class CarritoListView(BaseListView):
+    model = Carrito
+    model_name = "Carritos"
+    campos = ['id_carrito', 'id_cliente', 'id_proventa', 'creacion']
+
 ################################
 class ModelFactory:
     models_forms = {
@@ -486,7 +491,8 @@ class ModelFactory:
         'clientes': (Cliente, ClienteForm),
         'repertorios' : (Repertorio, RepertorioForm),
         'usuarioadmins': (UsuarioAdmin, UsuarioAdminForm),
-        'detallesrepertorio': (DetalleRepertorio, DetalleRepertorioForm)
+        'detallesrepertorio': (DetalleRepertorio, DetalleRepertorioForm),
+        'carritos': (Carrito, CarritoForm)
     }
 
     @classmethod
