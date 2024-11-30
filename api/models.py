@@ -169,7 +169,7 @@ class ProductoVenta(models.Model):
         db_table = 'productos_venta'
 
     def __str__(self):
-        return f"Prod Venta {self.id_proventa} - {self.fecha_venta} - {self.estado}"
+        return f"Prod Venta {self.id_proventa} - {self.id_proventa} - {self.estado}"
 
 class ProductoPrima(models.Model):
     id_proprima = models.AutoField(primary_key=True)
