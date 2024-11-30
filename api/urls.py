@@ -30,4 +30,5 @@ urlpatterns = [
 
     path('api-token-auth/', views.obtain_auth_token),
     path('logout/', LogoutView.as_view(), name='logout'),
+    path('status/', Status.as_view(), name='status'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

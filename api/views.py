@@ -150,6 +150,11 @@ class CarritoListCreate(ListCreateView):
 #         else:
 #             return Response({"message": "Password is incorrect"}, status=status.HTTP_400_BAD_REQUEST)
 
+class Status(APIView):
+    def get(self, request):
+        response = Response({"detail": "success"}, status=status.HTTP_200_OK)
+        return response
+
 class RegistroView(APIView):
     def post(self, request):
         serializer = ClienteSerializer(data=request.data.copy())
