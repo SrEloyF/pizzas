@@ -371,16 +371,34 @@ class BaseListView(LoginRequiredMixin, ListView):
     login_url = '/panel_admin/login/'
     template_name = 'panel_admin/lista.html'
     context_object_name = 'objetos'
-    paginate_by = 8
+    paginate_by = 7
 
     def get_queryset(self):
         self.queryset_original = super().get_queryset()
         queryset = self.queryset_original
         campo = self.request.GET.get('campo')
         valor = self.request.GET.get('valor')
+
         if campo and valor:
-            filtro = {f"{campo}__icontains": valor}
-            queryset = queryset.filter(**filtro)
+            try:
+                model_field = self.model._meta.get_field(campo)
+                
+                if model_field.is_relation:
+                    related_model = model_field.related_model
+                    related_fields = [
+                        f.name for f in related_model._meta.get_fields() if isinstance(f, (models.CharField, models.TextField))
+                    ]
+                    if related_fields:
+                        related_field = f"{campo}__{related_fields[0]}"
+                        filtro = {f"{related_field}__icontains": valor}
+                    else:
+                        raise ValueError(f"No se encontró un campo de texto en el modelo relacionado para '{campo}'.")
+                else:
+                    filtro = {f"{campo}__icontains": valor}
+                queryset = queryset.filter(**filtro)
+            except Exception as e:
+                print(f"Error en el filtro: {e}")
+
         self.queryset_filtrado = queryset
         return queryset
 
