@@ -63,6 +63,20 @@ class PedidoListCreate(ListCreateView):
 class ProductoVentaListCreate(ListCreateView):
     serializer_class = ProductoVentaSerializer
 
+    def delete(self, request, *args, **kwargs):
+        id_proventa = request.data.get('id_proventa', None)
+
+        if not id_proventa:
+            return Response({"detail": "id_proventa is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        productos = ProductoVenta.objects.filter(id_proventa=id_proventa)
+        
+        if productos.exists():
+            productos.delete()
+            return Response({"detail": "Producto eliminado exitosamente."}, status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({"detail": "No hay productos existentes con el id_proventa proporcionado"}, status=status.HTTP_404_NOT_FOUND)
+
 class ProductoPrimaListCreate(ListCreateView):
     serializer_class = ProductoPrimaSerializer
 
@@ -71,6 +85,20 @@ class DetallePedidoListCreate(ListCreateView):
 
 class PaqueteListCreate(ListCreateView):
     serializer_class = PaqueteSerializer
+
+    def delete(self, request, *args, **kwargs):
+        id_proventa = request.data.get('id_proventa', None)
+
+        if not id_proventa:
+            return Response({"detail": "id_proventa is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        paquetes = Paquete.objects.filter(id_proventa=id_proventa)
+        
+        if paquetes.exists():
+            paquetes.delete()
+            return Response({"detail": "Paquete eliminado exitosamente."}, status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({"detail": "No hay paquetes existentes con el id_proventa proporcionado."}, status=status.HTTP_404_NOT_FOUND)
 
 class EmpleadoListCreate(ListCreateView):
     serializer_class = EmpleadoSerializer
@@ -86,6 +114,19 @@ class DetalleRepertorioListCreate(ListCreateView):
 
 class CarritoListCreate(ListCreateView):
     serializer_class = CarritoSerializer
+
+    def delete(self, request, *args, **kwargs):
+        proventa_id = request.data.get('id_proventa', None)
+        
+        if proventa_id:
+            try:
+                carrito = Carrito.objects.get(id_proventa=proventa_id)
+                carrito.delete()
+                return Response({"message": "Producto quitado del carrito con éxito."}, status=status.HTTP_204_NO_CONTENT)
+            except Carrito.DoesNotExist:
+                return Response({"error": "Producto no encontrado en el carrito."}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({"error": "No se proporcionó un id_proventa."}, status=status.HTTP_400_BAD_REQUEST)
 
 # class EncryptPasswordView(APIView):
 #     def post(self, request):

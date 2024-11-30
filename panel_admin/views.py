@@ -442,7 +442,7 @@ class PedidoListView(BaseListView):
 class DetallePedidoListView(BaseListView):
     model = DetallePedido
     model_name = "detallepedido"
-    campos = ['id_detalle', 'pedido', 'proventa', 'precio']
+    campos = ['id_detalle', 'id_pedido', 'id_proventa', 'precio']
 
 class PagoListView(BaseListView):
     model = Pago
