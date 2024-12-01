@@ -53,7 +53,7 @@ class DetallePedidoAdmin(admin.ModelAdmin):
 
 @admin.register(Paquete)
 class PaqueteAdmin(admin.ModelAdmin):
-    list_display = ('id_proventa', 'id_proprima')
+    list_display = ('id_proventa', 'id_proprima', 'cantidad')
     search_fields = ('proventa__id_proventa',)
 
 @admin.register(Empleado)

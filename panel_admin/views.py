@@ -450,7 +450,7 @@ class ProductoPrimaListView(BaseListView):
 class PaqueteListView(BaseListView):
     model = Paquete
     model_name = "Paquetes"
-    campos = ['id_paquete', 'id_proventa', 'id_proprima']
+    campos = ['id_paquete', 'id_proventa', 'id_proprima', 'cantidad']
 
 class PedidoListView(BaseListView):
     model = Pedido

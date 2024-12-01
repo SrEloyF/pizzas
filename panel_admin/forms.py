@@ -71,7 +71,7 @@ class ProductoPrimaForm(BaseForm):
 class PaqueteForm(BaseForm):
     class Meta:
         model = Paquete
-        fields = ['id_proventa', 'id_proprima']
+        fields = ['id_proventa', 'id_proprima', 'cantidad']
 
 class PedidoForm(BaseForm):
     class Meta:

@@ -118,7 +118,7 @@ class Pedido(models.Model):
     
 class Pago(models.Model):
     id_pago = models.AutoField(primary_key=True)
-    id_pedido = models.ForeignKey(Pedido, db_column='id_pedido', on_delete=models.PROTECT)
+    id_pedido = models.OneToOneField(Pedido, db_column='id_pedido', on_delete=models.PROTECT)
     monto = models.DecimalField(max_digits=10, decimal_places=2)
     metodo_pago = models.CharField(max_length=45)
     estado = models.CharField(max_length=45)
@@ -169,7 +169,7 @@ class ProductoVenta(models.Model):
         db_table = 'productos_venta'
 
     def __str__(self):
-        return f"Prod Venta {self.id_proventa} - {self.id_proventa} - {self.estado}"
+        return f"Prod Venta {self.id_proventa} - {self.id_repertorio} - {self.estado}"
 
 class ProductoPrima(models.Model):
     id_proprima = models.AutoField(primary_key=True)
@@ -189,7 +189,7 @@ class ProductoPrima(models.Model):
 class DetallePedido(models.Model):
     id_detalle = models.AutoField(primary_key=True)
     id_pedido = models.ForeignKey(Pedido, db_column='id_pedido',on_delete=models.PROTECT)
-    id_proventa = models.ForeignKey(ProductoVenta, db_column='id_proventa', on_delete=models.PROTECT)
+    id_proventa = models.OneToOneField(ProductoVenta, db_column='id_proventa', on_delete=models.PROTECT)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
 
     class Meta:
@@ -203,6 +203,7 @@ class Paquete(models.Model):
     id_paquete = models.AutoField(primary_key=True)
     id_proventa = models.ForeignKey(ProductoVenta, db_column='id_proventa',on_delete=models.PROTECT)
     id_proprima = models.ForeignKey(ProductoPrima, db_column='id_proprima', on_delete=models.PROTECT)
+    cantidad = models.PositiveIntegerField()
 
     class Meta:
         db_table = 'paquetes'
@@ -218,7 +219,7 @@ class Empleado(models.Model):
     ]
     id_empleado = models.AutoField(primary_key=True)
     id_sucursal = models.ForeignKey(Sucursal, db_column='id_sucursal',on_delete=models.PROTECT)
-    id_area = models.ForeignKey(Area, db_column='id_area',on_delete=models.PROTECT)
+    id_area = models.OneToOneField(Area, db_column='id_area',on_delete=models.PROTECT)
     nombre = models.CharField(max_length=45)
     apellido = models.CharField(max_length=45)
     cargo = models.CharField(max_length=45)
@@ -247,8 +248,8 @@ class Historial(models.Model):
     
 class Carrito(models.Model):
     id_carrito = models.AutoField(primary_key=True)
-    id_cliente = models.ForeignKey(Cliente, db_column='id_cliente', on_delete=models.PROTECT)
-    id_proventa = models.ForeignKey(ProductoVenta, db_column='id_proventa', on_delete=models.PROTECT)
+    id_cliente = models.OneToOneField(Cliente, db_column='id_cliente', on_delete=models.PROTECT)
+    id_proventa = models.OneToOneField(ProductoVenta, db_column='id_proventa', on_delete=models.PROTECT)
     creacion = models.DateTimeField(auto_now_add=True)
 
     class Meta:
