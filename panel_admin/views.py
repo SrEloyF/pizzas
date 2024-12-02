@@ -6,7 +6,6 @@ from panel_admin.forms import *
 import json
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404
-from django.forms import modelform_factory
 from .forms import *
 from django.http import Http404
 from django.contrib import messages
@@ -16,8 +15,8 @@ from django.contrib.auth import authenticate, login
 
 from django.utils import timezone
 from datetime import timedelta
-from django.db.models.functions import TruncMonth, TruncDay, TruncHour, Concat
-from django.db.models import Value, Count, Sum, Avg, F, Q, ExpressionWrapper, fields, DurationField, FloatField
+from django.db.models.functions import TruncMonth, TruncDay, TruncHour, Concat, Coalesce
+from django.db.models import Value, Count, Sum, Avg, F, Q, ExpressionWrapper, DurationField
 import locale
 
 locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
@@ -33,13 +32,19 @@ def vista_admin_ventas(request):
         .filter(fecha_pedido__gte=hace_12_meses)
         .annotate(mes=TruncMonth('fecha_pedido'))
         .values('mes')
-        .annotate(total_ventas=Count('id_pedido'))
+        .annotate(
+            total_ventas=Count('id_pedido'),
+            total_ingresos=Sum('pago__monto', default=0)
+        )
         .order_by('mes')
     )
+
     data_ventas = []
     for mes in meses:
-        total = next((venta['total_ventas'] for venta in ventas_mensuales if venta['mes'].strftime("%B %Y") == mes), 0)
-        data_ventas.append(total)
+        venta_mes = next((venta for venta in ventas_mensuales if venta['mes'].strftime("%B %Y") == mes), None)
+        total_ventas = venta_mes['total_ventas'] if venta_mes else 0
+        total_ingresos = float(venta_mes['total_ingresos']) if venta_mes and venta_mes['total_ingresos'] else 0
+        data_ventas.append(f"{total_ventas} - S/.{total_ingresos:.2f}")
 
     #metodos pagos
     metodos_pago = Pago.objects.values('metodo_pago').annotate(cantidad=Count('id_pago'))
@@ -75,8 +80,8 @@ def vista_admin_ventas(request):
 
     return render(request, 'panel_admin/admin_ventas.html', {
         'data_ventas': json.dumps(data_ventas),
-        'data_pagos': json.dumps(data_pagos),
         'meses': json.dumps(meses),
+        'data_pagos': json.dumps(data_pagos),
         'top_dias_data': top_dias_data,
         'top_horas_data': top_horas_data,
         'ingresos_mes': ingresos_mes,
@@ -282,9 +287,13 @@ def vista_admin_pprima(request):
         .values_list('id_proprima__nombre', 'total_vendido')
     )
 
+    prod_prima_mas_vendidos = [(nombre, int(total)) for nombre, total in prod_prima_mas_vendidos]
+
     prod_prima_menos_vendidos = list(
         Paquete.objects.values('id_proprima__nombre')
-        .annotate(total_vendido=Sum('id_proventa__detallepedido'))
+        .annotate(
+            total_vendido=Coalesce(Sum('id_proventa__detallepedido'), 0)
+        )
         .order_by('total_vendido')[:4]
         .values_list('id_proprima__nombre', 'total_vendido')
     )
