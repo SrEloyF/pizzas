@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.hashers import make_password, check_password
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
 class UsuarioAdminManager(BaseUserManager):
@@ -99,12 +99,17 @@ class Sucursal(models.Model):
         db_table = 'sucursales'
 
 class Pedido(models.Model):
+    ESTADO_CHOICE = [
+        ('entregado', 'Entregado'),
+        ('devuelto', 'Devuelto'),
+        ('Cancelado', 'Cancelado')
+    ]
     id_pedido = models.AutoField(primary_key=True)
     id_sucursal = models.ForeignKey(Sucursal, db_column='id_sucursal',on_delete=models.PROTECT)
     id_cliente = models.ForeignKey(Cliente, db_column='id_cliente',on_delete=models.PROTECT)
     fecha_pedido = models.DateTimeField()
     fecha_entrega = models.DateTimeField()
-    estado = models.CharField(max_length=45)
+    estado = models.CharField(max_length=45, choices=ESTADO_CHOICE)
     nombre_ref = models.CharField(max_length=45)
     correo = models.CharField(max_length=85)
     direccion = models.CharField(max_length=85)
@@ -117,11 +122,22 @@ class Pedido(models.Model):
         return f"Pedido {self.id_pedido} - {self.estado}"
     
 class Pago(models.Model):
+    ESTADOS_CHOICES = [
+        ('pagado', 'Pagado'),
+        ('deuda', 'Deuda'),
+    ]
+
+    METODO_PAGO_CHOICES = [
+        ('efectivo', 'Efectivo'),
+        ('tarjeta', 'Tarjeta'),
+        ('digital', 'Digital')
+    ]
+
     id_pago = models.AutoField(primary_key=True)
     id_pedido = models.OneToOneField(Pedido, db_column='id_pedido', on_delete=models.PROTECT)
     monto = models.DecimalField(max_digits=10, decimal_places=2)
-    metodo_pago = models.CharField(max_length=45)
-    estado = models.CharField(max_length=45)
+    metodo_pago = models.CharField(max_length=45, choices=METODO_PAGO_CHOICES)
+    estado = models.CharField(max_length=45, choices=ESTADOS_CHOICES)
 
     class Meta:
         db_table = 'pagos'
@@ -147,23 +163,68 @@ class Repertorio(models.Model):
         return f"{self.id_repertorio} - {self.titulo}"
     
 class DetalleRepertorio(models.Model):
+
+    PRODUCTO_CHOICES = [
+        ('pizza', 'Pizza'),
+        ('lasagna', 'Lasagna'),
+        ('bebida', 'Bebida'),
+        ('agregado', 'Agregado'),
+    ]
+
+    DETALLE_CHOICES = [
+        ('mediana', 'Mediana'),
+        ('grande', 'Grande'),
+        ('personal', 'Personal'),
+        ('familiar', 'Familiar'),
+        ('simple', 'Simple'),
+        ('x', 'X'),
+        ('xl', 'XL'),
+        ('1/2 litro', '1/2 litro'),
+        ('1 litro', '1 litro'),
+        ('10 unidades', '10 unidades'),
+        ('5 unidades', '5 unidades'),
+        ('3 unidades', '3 unidades'),
+    ]
+    
+    PRODUCTO_DETALLE_MAP = {
+        'pizza': ['mediana', 'grande', 'personal', 'familiar'],
+        'lasagna': ['simple', 'x', 'xl'],
+        'bebida': ['1/2 litro', '1 litro'],
+        'agregado': ['10 unidades', '5 unidades', '3 unidades'],
+    }
+    
     id_detalle_repertorio = models.AutoField(primary_key=True)
     id_repertorio = models.ForeignKey(Repertorio, db_column='id_repertorio', on_delete=models.PROTECT)
-    producto = models.CharField(max_length=100)
+    producto = models.CharField(max_length=100, choices=PRODUCTO_CHOICES)
     unidades = models.PositiveIntegerField()
-    detalle = models.CharField(max_length=200)
+    detalle = models.CharField(max_length=200, choices=DETALLE_CHOICES)
 
     class Meta:
         db_table = 'detalles_repertorio'
     
     def __str__(self):
         return f"{self.id_detalle_repertorio} - {self.producto}"
+    
+    def clean(self):
+        super().clean()
+        valid_choices = self.PRODUCTO_DETALLE_MAP.get(self.producto.lower())
+        if valid_choices and self.detalle not in valid_choices:
+            raise ValidationError({
+                'detalle': f"El detalle '{self.detalle}' no es válido para el producto '{self.producto}'. Opciones válidas: {', '.join(valid_choices)}"
+            })
+
+
 
 class ProductoVenta(models.Model):
+    ESTADO_CHOICE = [
+        ('carrito', 'Carrito'),
+        ('pedido', 'Pedido'),
+    ]
+
     id_proventa = models.AutoField(primary_key=True)
     id_repertorio = models.ForeignKey(Repertorio, db_column='id_repertorio', on_delete= models.PROTECT)
     fecha_venta = models.DateField()
-    estado = models.CharField(max_length=45)
+    estado = models.CharField(max_length=45, choices=ESTADO_CHOICE)
 
     class Meta:
         db_table = 'productos_venta'
@@ -214,15 +275,24 @@ class Paquete(models.Model):
 
 class Empleado(models.Model):
     ESTADO_CHOICES = [
-        ('disponible', 'Disponible'),
-        ('no_disponible', 'No Disponible'),
+        ('servicio', 'Servicio'),
+        ('no servicio', 'No Servicio'),
+        ('despedido', "Despedido")
     ]
+
+    CARGO_CHOICES = [
+        ('repartidor', 'Repartidor'),
+        ('recepcion', 'Recepcion'),
+        ('cocinero', 'Cocinero'),
+        ('administrador', 'Administrador')
+    ]
+
     id_empleado = models.AutoField(primary_key=True)
     id_sucursal = models.ForeignKey(Sucursal, db_column='id_sucursal',on_delete=models.PROTECT)
     id_area = models.OneToOneField(Area, db_column='id_area',on_delete=models.PROTECT)
     nombre = models.CharField(max_length=45)
     apellido = models.CharField(max_length=45)
-    cargo = models.CharField(max_length=45)
+    cargo = models.CharField(max_length=45, choices=CARGO_CHOICES)
     estado = models.CharField(max_length=25, choices=ESTADO_CHOICES, default='disponible')
 
     class Meta:
@@ -233,10 +303,16 @@ class Empleado(models.Model):
         return f"{self.nombre} {self.apellido}"
 
 class Historial(models.Model):
+    DETALLE_CHOICES = [
+        ('preparacion', 'Preparacion'),
+        ('en camino', 'En camino'),
+        ('entregando', 'Entregando'),
+        ('completado', 'Completado'),
+    ]
     id_historial = models.AutoField(primary_key=True)
     id_empleado = models.ForeignKey(Empleado, db_column='id_empleado',on_delete=models.PROTECT)
     id_pedido = models.ForeignKey(Pedido, db_column='id_pedido', on_delete=models.PROTECT)
-    detalle = models.CharField(max_length=45)
+    detalle = models.CharField(max_length=45, choices=DETALLE_CHOICES)
     fecha = models.DateField()
 
     class Meta:

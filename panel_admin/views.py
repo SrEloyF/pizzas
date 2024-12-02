@@ -190,12 +190,13 @@ def vista_admin_empleados(request):
 
     # 4. Estados de los empleados
     estado_empleados = [
-        ["Disponible", Empleado.objects.filter(estado="disponible").count()],
-        ["No Disponible", Empleado.objects.filter(estado="no_disponible").count()],
+        ["Servicio", Empleado.objects.filter(estado="servicio").count()],
+        ["No Servicio", Empleado.objects.filter(estado="no servicio").count()],
+        ["Despedido", Empleado.objects.filter(estado="despedido").count()],
     ]
     
     # 5. Ventas promedio por empleado
-    ventas_promedio_por_empleado = 1.2  # Está definido para pruebas, déjalo así
+    ventas_promedio_por_empleado = 2.2  # Está definido para pruebas, déjalo así
 
     # 6. Tiempo promedio entre pedidos.fecha_pedido y pedidos.fecha_entrega en horas
     tiempo_promedio_pedido = (
@@ -276,14 +277,14 @@ def vista_admin_pprima(request):
 
     prod_prima_mas_vendidos = list(
         Paquete.objects.values('id_proprima__nombre')
-        .annotate(total_vendido=Sum('id_proventa__detallepedido__cantidad'))
+        .annotate(total_vendido=Sum('id_proventa__detallepedido'))
         .order_by('-total_vendido')[:4]
         .values_list('id_proprima__nombre', 'total_vendido')
     )
 
     prod_prima_menos_vendidos = list(
         Paquete.objects.values('id_proprima__nombre')
-        .annotate(total_vendido=Sum('id_proventa__detallepedido__cantidad'))
+        .annotate(total_vendido=Sum('id_proventa__detallepedido'))
         .order_by('total_vendido')[:4]
         .values_list('id_proprima__nombre', 'total_vendido')
     )
@@ -297,12 +298,11 @@ def vista_admin_pprima(request):
 
     categorias_mas_vendidas = list(
         Paquete.objects.values('id_proprima__id_categoria__nombre')
-        .annotate(total_vendido=Sum('id_proventa__detallepedido__cantidad'))
+        .annotate(total_vendido=Sum('id_proventa__detallepedido'))
         .order_by('-total_vendido')[:4]
         .values_list('id_proprima__id_categoria__nombre', 'total_vendido')
     )
 
-    # Renderizar datos al template
     return render(request, 'panel_admin/admin_pprima.html', {
         'costo_total_inventario': round(costo_total_inventario, 2),
         'precio_promedio_prod_prima': round(precio_promedio_prod_prima, 2),
