@@ -85,6 +85,16 @@
     
     const graficoLinealVentasAnio = echarts.init(document.getElementById('graficoLinealVentasAnio'));
 
+    const ventas = chartData.map(item => {
+        const ventasString = item.split(' - ')[0];
+        return parseFloat(ventasString);
+    });
+
+    const ganancias = chartData.map(item => {
+        const gananciasString = item.split(' - ')[1];
+        return parseFloat(gananciasString.replace('S/.', '').replace(',', '')); 
+    });
+
     const option = {
         title: {
             text: null,
@@ -99,14 +109,23 @@
                 rotate: 30
             }
         },
-        yAxis: {
+        yAxis: [{
             type: 'value',
             name: 'Ventas',
-        },
+            axisLabel: {
+                formatter: '{value}'
+            }
+        }, {
+            type: 'value',
+            name: 'Ganancias (S/.)',
+            axisLabel: {
+                formatter: 'S/. {value}'
+            }
+        }],
         series: [{
             name: 'Ventas',
             type: 'line',
-            data: chartData,
+            data: ventas,
             smooth: true,
             itemStyle: {
                 color: '#D03139'
@@ -116,9 +135,21 @@
             },
             symbol: 'circle',
             symbolSize: 8,
+        }, {
+            name: 'Ganancias (S/.)',
+            type: 'line',
+            data: ganancias,
+            smooth: true,
+            itemStyle: {
+                color: '#4CAF50'
+            },
+            lineStyle: {
+                width: 3
+            },
+            symbol: 'circle',
+            symbolSize: 8,
         }]
     };
-
     graficoLinealVentasAnio.setOption(option);
 
     // Gráfico Circular de Métodos de Pago

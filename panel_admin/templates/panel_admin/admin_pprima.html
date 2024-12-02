@@ -91,32 +91,36 @@
 </div>
 
 <script>
-        const chartDataProductos = {{ prod_prima_mas_vendidos|safe }};
-        const nombresProductos = chartDataProductos.map(item => item[0]);
-        const cantidades = chartDataProductos.map(item => item[1]);
-        const arreglo_colores = ["#FF6787", "#FFB68C", "#B6D3E2", "#97ED97", "#55CBD3", "#D18BC0", "#F9D877", "#FE8E7B",  "#C7EEFF", "#6384B3"];
-        const graficoLinealVentasAnio = echarts.init(document.getElementById('graficoBarrasProdPrimaMasVendidos'));
-        const option = {
-            title: {
-                text: null
-            },
-            tooltip: {},
-            xAxis: {
-                type: 'category',
-                data: nombresProductos
-            },
-            yAxis: {
-                type: 'value'
-            },
-            series: [{
-                name: 'Ventas',
-                type: 'bar',
-                data: cantidades,
-                itemStyle: {
-                    color: (params) => arreglo_colores[params.dataIndex % arreglo_colores.length]
-                }
-            }]
-        };
-        graficoLinealVentasAnio.setOption(option);
-    </script>
+    const chartDataProductos = JSON.parse('{{ prod_prima_mas_vendidos|escapejs }}');
+    const nombresProductos = chartDataProductos.map(item => item[0]);
+    const cantidades = chartDataProductos.map(item => item[1]);
+    
+    const arreglo_colores = ["#FF6787", "#FFB68C", "#B6D3E2", "#97ED97", "#55CBD3", "#D18BC0", "#F9D877", "#FE8E7B",  "#C7EEFF", "#6384B3"];
+    const graficoLinealVentasAnio = echarts.init(document.getElementById('graficoBarrasProdPrimaMasVendidos'));
+
+    const option = {
+        title: {
+            text: null
+        },
+        tooltip: {},
+        xAxis: {
+            type: 'category',
+            data: nombresProductos
+        },
+        yAxis: {
+            type: 'value'
+        },
+        series: [{
+            name: 'Ventas',
+            type: 'bar',
+            data: cantidades,
+            itemStyle: {
+                color: (params) => arreglo_colores[params.dataIndex % arreglo_colores.length]
+            }
+        }]
+    };
+
+    graficoLinealVentasAnio.setOption(option);
+</script>
+
 {% endblock %}

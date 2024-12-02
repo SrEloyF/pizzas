@@ -315,7 +315,7 @@ def vista_admin_pprima(request):
     return render(request, 'panel_admin/admin_pprima.html', {
         'costo_total_inventario': round(costo_total_inventario, 2),
         'precio_promedio_prod_prima': round(precio_promedio_prod_prima, 2),
-        'prod_prima_mas_vendidos': prod_prima_mas_vendidos,
+        'prod_prima_mas_vendidos': json.dumps(prod_prima_mas_vendidos),
         'prod_prima_menos_vendidos': prod_prima_menos_vendidos,
         'prod_prima_bajo_stock': prod_prima_bajo_stock,
         'categorias_mas_vendidas': categorias_mas_vendidas
