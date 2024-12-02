@@ -1,5 +1,6 @@
 from django import forms
 from api.models import *
+from django.contrib.auth.hashers import make_password
 
 class BaseForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
