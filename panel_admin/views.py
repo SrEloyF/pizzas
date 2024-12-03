@@ -449,12 +449,12 @@ class EmpleadoListView(BaseListView):
 class ProductoVentaListView(BaseListView):
     model = ProductoVenta
     model_name = "ProductosVenta"
-    campos = ['id_proventa', 'id_repertorio','fecha_venta', 'estado']
+    campos = ['id_proventa', 'id_repertorio', 'estado']
 
 class ProductoPrimaListView(BaseListView):
     model = ProductoPrima
     model_name = "ProductosPrima"
-    campos = ['id_proprima', 'id_categoria', 'nombre', 'precio', 'descripcion', 'stock']
+    campos = ['id_proprima', 'id_categoria', 'nombre', 'precio', 'tamano', 'stock']
 
 class PaqueteListView(BaseListView):
     model = Paquete
@@ -464,7 +464,7 @@ class PaqueteListView(BaseListView):
 class PedidoListView(BaseListView):
     model = Pedido
     model_name = "Pedidos"
-    campos = ['id_pedido', 'id_sucursal', 'id_cliente', 'fecha_pedido', 'fecha_entrega', 'estado', 'nombre_ref', 'correo', 'direccion']
+    campos = ['id_pedido', 'id_sucursal', 'id_cliente', 'fecha_pedido', 'fecha_entrega', 'estado', 'nombre_ref', 'direccion']
 
 class DetallePedidoListView(BaseListView):
     model = DetallePedido
@@ -494,7 +494,7 @@ class RepertorioListView(BaseListView):
 class DetalleRepertorioListView(BaseListView):
     model = DetalleRepertorio
     model_name = "DetallesRepertorio"
-    campos = ['id_detalle_repertorio', 'id_repertorio', 'producto', 'unidades', 'detalle']
+    campos = ['id_detalle_repertorio', 'id_repertorio', 'id_proprima', 'producto', 'unidades', 'detalle']
 
 class CarritoListView(BaseListView):
     model = Carrito

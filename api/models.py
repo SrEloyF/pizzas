@@ -111,7 +111,6 @@ class Pedido(models.Model):
     fecha_entrega = models.DateTimeField()
     estado = models.CharField(max_length=45, choices=ESTADO_CHOICE)
     nombre_ref = models.CharField(max_length=45)
-    correo = models.CharField(max_length=85)
     direccion = models.CharField(max_length=85)
 
     class Meta:
@@ -162,6 +161,38 @@ class Repertorio(models.Model):
     def __str__(self):
         return f"{self.id_repertorio} - {self.titulo}"
     
+class ProductoVenta(models.Model):
+    ESTADO_CHOICE = [
+        ('carrito', 'Carrito'),
+        ('pedido', 'Pedido'),
+    ]
+
+    id_proventa = models.AutoField(primary_key=True)
+    id_repertorio = models.ForeignKey(Repertorio, db_column='id_repertorio', on_delete= models.PROTECT)
+    fecha_estado = models.DateField(auto_now_add=True)
+    estado = models.CharField(max_length=45, choices=ESTADO_CHOICE)
+
+    class Meta:
+        db_table = 'productos_venta'
+
+    def __str__(self):
+        return f"Prod Venta {self.id_proventa} - {self.id_repertorio} - {self.estado}"
+
+class ProductoPrima(models.Model):
+    id_proprima = models.AutoField(primary_key=True)
+    id_categoria = models.ForeignKey(Categoria, db_column='id_categoria',on_delete=models.PROTECT)
+    nombre = models.CharField(max_length=45)
+    precio = models.DecimalField(max_digits=10, decimal_places=2)
+    tamano = models.CharField(max_length=300)
+    stock = models.PositiveIntegerField()
+
+    class Meta:
+        db_table = 'productos_prima'
+        unique_together = (('id_proprima', 'id_categoria'),)
+
+    def __str__(self):
+        return self.nombre
+    
 class DetalleRepertorio(models.Model):
 
     PRODUCTO_CHOICES = [
@@ -195,6 +226,7 @@ class DetalleRepertorio(models.Model):
     
     id_detalle_repertorio = models.AutoField(primary_key=True)
     id_repertorio = models.ForeignKey(Repertorio, db_column='id_repertorio', on_delete=models.PROTECT)
+    id_proprima = models.ForeignKey(ProductoPrima, db_column='id_proprima', on_delete=models.PROTECT, null=True, blank=True)
     producto = models.CharField(max_length=100, choices=PRODUCTO_CHOICES)
     unidades = models.PositiveIntegerField()
     detalle = models.CharField(max_length=200, choices=DETALLE_CHOICES)
@@ -213,39 +245,6 @@ class DetalleRepertorio(models.Model):
                 'detalle': f"El detalle '{self.detalle}' no es válido para el producto '{self.producto}'. Opciones válidas: {', '.join(valid_choices)}"
             })
 
-
-
-class ProductoVenta(models.Model):
-    ESTADO_CHOICE = [
-        ('carrito', 'Carrito'),
-        ('pedido', 'Pedido'),
-    ]
-
-    id_proventa = models.AutoField(primary_key=True)
-    id_repertorio = models.ForeignKey(Repertorio, db_column='id_repertorio', on_delete= models.PROTECT)
-    fecha_venta = models.DateField()
-    estado = models.CharField(max_length=45, choices=ESTADO_CHOICE)
-
-    class Meta:
-        db_table = 'productos_venta'
-
-    def __str__(self):
-        return f"Prod Venta {self.id_proventa} - {self.id_repertorio} - {self.estado}"
-
-class ProductoPrima(models.Model):
-    id_proprima = models.AutoField(primary_key=True)
-    id_categoria = models.ForeignKey(Categoria, db_column='id_categoria',on_delete=models.PROTECT)
-    nombre = models.CharField(max_length=45)
-    precio = models.DecimalField(max_digits=10, decimal_places=2)
-    descripcion = models.CharField(max_length=300)
-    stock = models.PositiveIntegerField()
-
-    class Meta:
-        db_table = 'productos_prima'
-        unique_together = (('id_proprima', 'id_categoria'),)
-
-    def __str__(self):
-        return self.nombre
 
 class DetallePedido(models.Model):
     id_detalle = models.AutoField(primary_key=True)

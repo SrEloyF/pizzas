@@ -35,13 +35,7 @@ class EmpleadoForm(BaseForm):
 class ProductoVentaForm(BaseForm):
     class Meta:
         model = ProductoVenta
-        fields = ['id_repertorio','fecha_venta', 'estado']
-        widgets = {
-            'fecha_venta': forms.DateInput(attrs={
-                'type': 'date',
-                'class': 'form-control',
-            }),
-        }
+        fields = ['id_repertorio', 'estado']
 
 class RepertorioForm(BaseForm):
     class Meta:
@@ -66,7 +60,7 @@ class RepertorioForm(BaseForm):
 class ProductoPrimaForm(BaseForm):
     class Meta:
         model = ProductoPrima
-        fields = ['id_categoria', 'nombre', 'precio', 'descripcion', 'stock']
+        fields = ['id_categoria', 'nombre', 'precio', 'tamano', 'stock']
 
 
 class PaqueteForm(BaseForm):
@@ -77,7 +71,7 @@ class PaqueteForm(BaseForm):
 class PedidoForm(BaseForm):
     class Meta:
         model = Pedido
-        fields = ['id_sucursal', 'id_cliente', 'fecha_pedido', 'fecha_entrega', 'estado', 'nombre_ref', 'correo', 'direccion']
+        fields = ['id_sucursal', 'id_cliente', 'fecha_pedido', 'fecha_entrega', 'estado', 'nombre_ref', 'direccion']
         widgets = {
             'fecha_pedido': forms.DateTimeInput(attrs={
                 'type': 'datetime-local',
@@ -87,7 +81,6 @@ class PedidoForm(BaseForm):
                 'type': 'datetime-local',
                 'class': 'form-control',
             }),
-            'correo': forms.EmailInput(attrs={'class': 'form-control'}),
         }
 
 class DetallePedidoForm(BaseForm):
@@ -142,7 +135,7 @@ class UsuarioAdminForm(BaseForm):
 class DetalleRepertorioForm(BaseForm):
     class Meta:
         model = DetalleRepertorio
-        fields = ['id_repertorio', 'producto', 'unidades', 'detalle']
+        fields = ['id_repertorio', 'id_proprima', 'producto', 'unidades', 'detalle']
 
 class CarritoForm(BaseForm):
     class Meta:

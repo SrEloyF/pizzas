@@ -34,16 +34,16 @@ class PagoAdmin(admin.ModelAdmin):
 @admin.register(Pedido)
 class PedidoAdmin(admin.ModelAdmin):
     list_display = ('id_cliente', 'id_sucursal', 'fecha_pedido', 'estado')
-    search_fields = ('nombre_ref', 'correo', 'direccion')
+    search_fields = ('nombre_ref','direccion')
 
 @admin.register(ProductoVenta)
 class ProductoVentaAdmin(admin.ModelAdmin):
-    list_display = ('id_repertorio', 'fecha_venta', 'estado')
+    list_display = ('id_repertorio', 'estado')
     search_fields = ('id_proventa',)
 
 @admin.register(ProductoPrima)
 class ProductoPrimaAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'precio', 'descripcion')
+    list_display = ('nombre', 'precio', 'tamano')
     search_fields = ('nombre',)
 
 @admin.register(DetallePedido)
@@ -73,7 +73,7 @@ class RepertirioAdmin(admin.ModelAdmin):
 
 @admin.register(DetalleRepertorio)
 class DetalleRepertorioAdmin(admin.ModelAdmin):
-    list_display = ('id_detalle_repertorio', 'id_repertorio', 'producto', 'unidades', 'detalle')
+    list_display = ('id_detalle_repertorio', 'id_repertorio', 'id_proprima', 'producto', 'unidades', 'detalle')
     search_fields = ('id_detalle_repertorio', 'producto')
 
 @admin.register(Carrito)

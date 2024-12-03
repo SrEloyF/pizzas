@@ -9,6 +9,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenRefreshView
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import *
+from rest_framework.exceptions import NotFound
+from django.apps import apps
 
 def get_tokens_for_user(cliente):
     refresh = RefreshToken.for_user(cliente)
@@ -260,3 +262,120 @@ class RefreshTokenView(TokenRefreshView):
         else:
             return Response({"detail": "Refresh token not found"}, status=status.HTTP_400_BAD_REQUEST)
 
+
+class DynamicSearchView(generics.GenericAPIView):
+    def get(self, request, columna, valor_a_buscar):
+        model_name = self.get_model_name()
+
+        try:
+            model = apps.get_model('api', model_name)
+        except LookupError:
+            return Response({"error": "Modelo no encontrado."}, status=400)
+
+        try:
+            if hasattr(model, columna):
+                obj = model.objects.get(**{columna: valor_a_buscar})
+                serializer_class = self.get_serializer_class(model_name)
+                serializer = serializer_class(obj)
+                return Response(serializer.data)
+            else:
+                return Response({"error": "Columna no válida."}, status=400)
+        except model.DoesNotExist:
+            return Response({"error": f"{model_name} no encontrado/a con ese valor en {columna}."}, status=404)
+
+    def get_serializer_class(self, model_name):
+        if model_name == 'Area':
+            return AreaSerializer
+        elif model_name == 'Cliente':
+            return ClienteSerializer
+        elif model_name == 'Categoria':
+            return CategoriaSerializer
+        elif model_name == 'Sucursal':
+            return SucursalSerializer
+        elif model_name == 'Pedido':
+            return PedidoSerializer
+        elif model_name == 'Pago':
+            return PagoSerializer
+        elif model_name == 'Repertorio':
+            return RepertorioSerializer
+        elif model_name == 'DetalleRepertorio':
+            return DetalleRepertorioSerializer
+        elif model_name == 'ProductoVenta':
+            return ProductoVentaSerializer
+        elif model_name == 'ProductoPrima':
+            return ProductoPrimaSerializer
+        elif model_name == 'DetallePedido':
+            return DetallePedidoSerializer
+        elif model_name == 'Paquete':
+            return PaqueteSerializer
+        elif model_name == 'Empleado':
+            return EmpleadoSerializer
+        elif model_name == 'Historial':
+            return HistorialSerializer
+        elif model_name == 'Carrito':
+            return CarritoSerializer
+        else:
+            raise LookupError("Serializador sin definir para este modelo.")
+
+    def get_model_name(self):
+        raise NotImplementedError("Este método debe ser implementado en las subclases.")
+
+class AreaSearchView(DynamicSearchView):
+    def get_model_name(self):
+        return 'Area'
+
+class ClienteSearchView(DynamicSearchView):
+    def get_model_name(self):
+        return 'Cliente'
+
+class CategoriaSearchView(DynamicSearchView):
+    def get_model_name(self):
+        return 'Categoria'
+
+class SucursalSearchView(DynamicSearchView):
+    def get_model_name(self):
+        return 'Sucursal'
+
+class PedidoSearchView(DynamicSearchView):
+    def get_model_name(self):
+        return 'Pedido'
+
+class PagoSearchView(DynamicSearchView):
+    def get_model_name(self):
+        return 'Pago'
+
+class RepertorioSearchView(DynamicSearchView):
+    def get_model_name(self):
+        return 'Repertorio'
+
+class DetalleRepertorioSearchView(DynamicSearchView):
+    def get_model_name(self):
+        return 'DetalleRepertorio'
+
+class ProductoVentaSearchView(DynamicSearchView):
+    def get_model_name(self):
+        return 'ProductoVenta'
+    
+class ProductoPrimaSearchView(DynamicSearchView):
+    def get_model_name(self):
+        return 'ProductoPrima'
+
+class DetallePedidoSearchView(DynamicSearchView):
+    def get_model_name(self):
+        return 'DetallePedido'
+
+class PaqueteSearchView(DynamicSearchView):
+    def get_model_name(self):
+        return 'Paquete'
+
+class EmpleadoSearchView(DynamicSearchView):
+    def get_model_name(self):
+        return 'Empleado'
+
+class HistorialSearchView(DynamicSearchView):
+    def get_model_name(self):
+        return 'Historial'
+
+class CarritoSearchView(DynamicSearchView):
+    def get_model_name(self):
+        return 'Carrito'

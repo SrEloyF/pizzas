@@ -131,7 +131,7 @@ DATABASES = {
         'HOST': 'Elote.mysql.pythonanywhere-services.com',
         'PORT': '3306',
     }
-}
+}   
 
 AUTHENTICATION_BACKENDS = [
     'panel_admin.backends.UsuarioAdminBackend',
