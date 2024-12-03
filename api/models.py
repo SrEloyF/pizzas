@@ -56,8 +56,7 @@ class Area(models.Model):
     descripcion = models.CharField(max_length=300)
 
     def __str__(self):
-        return  self.nombre_area
-    
+        return  f"{self.id_area} - {self.nombre_area}" 
     class Meta:
         db_table = 'areas'
 
@@ -67,7 +66,7 @@ class Categoria(models.Model):
     descripcion = models.CharField(max_length=300)
 
     def __str__(self):
-        return self.nombre
+        return f"{self.id_categoria} - {self.nombre}"
     
     class Meta:
         db_table = 'categorias'
@@ -80,7 +79,7 @@ class Cliente(models.Model):
     contrasena = models.CharField(max_length=255)
 
     def __str__(self):
-        return f"{self.usuario} - {self.correo}"
+        return f"{self.id_cliente} - {self.usuario}"
     
     class Meta:
         db_table = 'clientes'
@@ -93,7 +92,7 @@ class Sucursal(models.Model):
     hora_cierre = models.TimeField()
 
     def __str__(self):
-        return self.direccion
+        return f"{self.id_sucursal} - {self.direccion}"
     
     class Meta:
         db_table = 'sucursales'
@@ -191,7 +190,7 @@ class ProductoPrima(models.Model):
         unique_together = (('id_proprima', 'id_categoria'),)
 
     def __str__(self):
-        return self.nombre
+        return f"{self.id_proprima} - {self.nombre}"
     
 class DetalleRepertorio(models.Model):
 
@@ -299,7 +298,7 @@ class Empleado(models.Model):
         unique_together = (('id_empleado', 'id_sucursal', 'id_area'),)
 
     def __str__(self):
-        return f"{self.nombre} {self.apellido}"
+        return f"{self.id_empleado} - {self.nombre} {self.apellido}"
 
 class Historial(models.Model):
     DETALLE_CHOICES = [
