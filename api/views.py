@@ -274,14 +274,17 @@ class DynamicSearchView(generics.GenericAPIView):
 
         try:
             if hasattr(model, columna):
-                obj = model.objects.get(**{columna: valor_a_buscar})
+                queryset = model.objects.filter(**{columna: valor_a_buscar})
+                if not queryset.exists():
+                    return Response({"error": f"{model_name} no encontrado/a con ese valor en {columna}."}, status=404)
+
                 serializer_class = self.get_serializer_class(model_name)
-                serializer = serializer_class(obj)
+                serializer = serializer_class(queryset, many=True)
                 return Response(serializer.data)
             else:
                 return Response({"error": "Columna no válida."}, status=400)
-        except model.DoesNotExist:
-            return Response({"error": f"{model_name} no encontrado/a con ese valor en {columna}."}, status=404)
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
 
     def get_serializer_class(self, model_name):
         if model_name == 'Area':
