@@ -145,6 +145,11 @@ class Pago(models.Model):
         return f"Pago {self.id_pago} - {self.estado}"
 
 class Repertorio(models.Model):
+    SERVIDOR_CHOICE = [
+        ('android', 'Android'),
+        ('web', 'Web'),
+    ]
+
     id_repertorio = models.AutoField(primary_key=True)
     titulo = models.CharField(max_length=60)
     descripcion = models.CharField(max_length=300)
@@ -153,6 +158,7 @@ class Repertorio(models.Model):
     fecha_fin = models.DateField()
     tipo_repertorio = models.CharField(max_length=100)
     imagen = models.ImageField(upload_to='repertorio/', null=True, blank=True)
+    servidor = models.CharField(max_length=50, choices=SERVIDOR_CHOICE)
 
     class Meta:
         db_table = 'repertorios'
@@ -190,7 +196,7 @@ class ProductoPrima(models.Model):
         unique_together = (('id_proprima', 'id_categoria'),)
 
     def __str__(self):
-        return f"{self.id_proprima} - {self.nombre}"
+        return f"{self.id_proprima} - {self.nombre} - {self.tamano}"
     
 class DetalleRepertorio(models.Model):
 

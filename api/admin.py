@@ -68,7 +68,7 @@ class HistorialAdmin(admin.ModelAdmin):
 
 @admin.register(Repertorio)
 class RepertirioAdmin(admin.ModelAdmin):
-    list_display = ('id_repertorio', 'titulo', 'descripcion', 'precio' ,'fecha_inic', 'fecha_fin', 'imagen')
+    list_display = ('id_repertorio', 'titulo', 'descripcion', 'precio' ,'fecha_inic', 'fecha_fin', 'imagen', 'servidor')
     search_fields = ('titulo',)
 
 @admin.register(DetalleRepertorio)
