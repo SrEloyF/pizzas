@@ -99,6 +99,7 @@ class Sucursal(models.Model):
 
 class Pedido(models.Model):
     ESTADO_CHOICE = [
+        ('pedido', 'Pedido'),
         ('entregado', 'Entregado'),
         ('devuelto', 'Devuelto'),
         ('Cancelado', 'Cancelado')
