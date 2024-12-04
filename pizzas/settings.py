@@ -125,10 +125,10 @@ WSGI_APPLICATION = 'pizzas.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'pizzas',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': 'localhost',
+        'NAME': 'Elote$default',
+        'USER': 'Elote',
+        'PASSWORD': 'Wasd_1234',
+        'HOST': 'Elote.mysql.pythonanywhere-services.com',
         'PORT': '3306',
     }
 }   
