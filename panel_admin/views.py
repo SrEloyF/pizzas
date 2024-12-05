@@ -464,7 +464,7 @@ class PaqueteListView(BaseListView):
 class PedidoListView(BaseListView):
     model = Pedido
     model_name = "Pedidos"
-    campos = ['id_pedido', 'id_sucursal', 'id_cliente', 'fecha_pedido', 'fecha_entrega', 'estado', 'nombre_ref', 'direccion']
+    campos = ['id_pedido', 'id_sucursal', 'id_cliente', 'fecha_pedido', 'fecha_entrega', 'estado', 'codigo', 'direccion']
 
 class DetallePedidoListView(BaseListView):
     model = DetallePedido

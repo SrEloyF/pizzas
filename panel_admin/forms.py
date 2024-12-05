@@ -71,7 +71,7 @@ class PaqueteForm(BaseForm):
 class PedidoForm(BaseForm):
     class Meta:
         model = Pedido
-        fields = ['id_sucursal', 'id_cliente', 'fecha_pedido', 'fecha_entrega', 'estado', 'nombre_ref', 'direccion']
+        fields = ['id_sucursal', 'id_cliente', 'fecha_pedido', 'fecha_entrega', 'estado', 'codigo', 'direccion']
         widgets = {
             'fecha_pedido': forms.DateTimeInput(attrs={
                 'type': 'datetime-local',

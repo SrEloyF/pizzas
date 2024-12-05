@@ -110,7 +110,7 @@ class Pedido(models.Model):
     fecha_pedido = models.DateTimeField()
     fecha_entrega = models.DateTimeField()
     estado = models.CharField(max_length=45, choices=ESTADO_CHOICE)
-    nombre_ref = models.CharField(max_length=45)
+    codigo = models.CharField(max_length=45)
     direccion = models.CharField(max_length=85)
 
     class Meta:

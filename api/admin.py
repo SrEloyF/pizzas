@@ -34,7 +34,7 @@ class PagoAdmin(admin.ModelAdmin):
 @admin.register(Pedido)
 class PedidoAdmin(admin.ModelAdmin):
     list_display = ('id_cliente', 'id_sucursal', 'fecha_pedido', 'estado')
-    search_fields = ('nombre_ref','direccion')
+    search_fields = ('codigo','direccion')
 
 @admin.register(ProductoVenta)
 class ProductoVentaAdmin(admin.ModelAdmin):
