@@ -295,7 +295,7 @@ class Empleado(models.Model):
 
     id_empleado = models.AutoField(primary_key=True)
     id_sucursal = models.ForeignKey(Sucursal, db_column='id_sucursal',on_delete=models.PROTECT)
-    id_area = models.OneToOneField(Area, db_column='id_area',on_delete=models.PROTECT)
+    id_area = models.ForeignKey(Area, db_column='id_area',on_delete=models.PROTECT)
     nombre = models.CharField(max_length=45)
     apellido = models.CharField(max_length=45)
     cargo = models.CharField(max_length=45, choices=CARGO_CHOICES)
