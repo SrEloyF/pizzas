@@ -16,8 +16,9 @@ from django.contrib.auth import authenticate, login
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models.functions import TruncMonth, TruncDay, TruncHour, Concat, Coalesce
-from django.db.models import Value, Count, Sum, Avg, F, Q, ExpressionWrapper, DurationField, FloatField
+from django.db.models import Value, Count, Sum, Avg, F, Q, ExpressionWrapper, DurationField, FloatField, Subquery, OuterRef
 import locale
+from django.utils.timezone import now
 
 locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
 hoy = timezone.now()
@@ -111,10 +112,19 @@ def vista_admin_clientes(request):
     total_clientes = Cliente.objects.count()
     
     # 4. Nuevos clientes en el mes actual
-    clientes_nuevos_mes = Cliente.objects.filter(
-        pedido__fecha_pedido__year=hoy.year,
-        pedido__fecha_pedido__month=hoy.month
-    ).count()
+    inicio_mes = now().replace(day=1)
+
+    subquery = Pedido.objects.filter(
+        id_cliente=OuterRef('id_cliente'),
+        fecha_pedido__lt=inicio_mes
+    ).values('id_cliente')
+
+    clientes_nuevos_mes = Pedido.objects.filter(
+        fecha_pedido__gte=inicio_mes, 
+        fecha_pedido__lt=now(),
+    ).exclude(
+        id_cliente__in=Subquery(subquery)
+    ).values('id_cliente').distinct().count()
 
     # 5. Clientes con más pedidos
     clientes_mas_frecuentes = (
