@@ -65,6 +65,22 @@ class PedidoListCreate(ListCreateView):
 class ProductoVentaListCreate(ListCreateView):
     serializer_class = ProductoVentaSerializer
 
+    def put(self, request, *args, **kwargs):
+        id_proventa = request.data.get('id_proventa', None)
+        
+        if not id_proventa:
+            return Response({"detail": "id_proventa is required."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            producto = ProductoVenta.objects.get(id_proventa=id_proventa)
+        except ProductoVenta.DoesNotExist:
+            return Response({"detail": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
+        serializer = self.get_serializer(producto, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     def delete(self, request, *args, **kwargs):
         id_proventa = request.data.get('id_proventa', None)
 
