@@ -301,7 +301,7 @@ def vista_admin_pprima(request):
     prod_prima_bajo_stock = list(
         ProductoPrima.objects.values('nombre')
         .annotate(stock_actual=Sum('stock'))
-        .order_by('stock_actual')[:8]
+        .order_by('stock_actual')[:4]
         .values_list('nombre', 'stock_actual')
     )
 
@@ -318,7 +318,7 @@ def vista_admin_pprima(request):
         'prod_prima_mas_vendidos': json.dumps(prod_prima_mas_vendidos),
         'prod_prima_menos_vendidos': prod_prima_menos_vendidos,
         'prod_prima_bajo_stock': prod_prima_bajo_stock,
-        'categorias_mas_vendidas': categorias_mas_vendidas
+        #'categorias_mas_vendidas': categorias_mas_vendidas
     })
 
 #ya no va
