@@ -330,7 +330,7 @@ class Historial(models.Model):
     
 class Carrito(models.Model):
     id_carrito = models.AutoField(primary_key=True)
-    id_cliente = models.OneToOneField(Cliente, db_column='id_cliente', on_delete=models.PROTECT)
+    id_cliente = models.ForeignKey(Cliente, db_column='id_cliente', on_delete=models.PROTECT)
     id_proventa = models.OneToOneField(ProductoVenta, db_column='id_proventa', on_delete=models.PROTECT)
     creacion = models.DateTimeField(auto_now_add=True)
 
