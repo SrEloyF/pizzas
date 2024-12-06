@@ -35,7 +35,7 @@ class EmpleadoForm(BaseForm):
 class ProductoVentaForm(BaseForm):
     class Meta:
         model = ProductoVenta
-        fields = ['id_repertorio', 'estado']
+        fields = ['id_repertorio', 'estado', 'codigo']
 
 class RepertorioForm(BaseForm):
     class Meta:

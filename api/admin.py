@@ -38,7 +38,7 @@ class PedidoAdmin(admin.ModelAdmin):
 
 @admin.register(ProductoVenta)
 class ProductoVentaAdmin(admin.ModelAdmin):
-    list_display = ('id_repertorio', 'estado')
+    list_display = ('id_repertorio', 'estado', 'codigo')
     search_fields = ('id_proventa',)
 
 @admin.register(ProductoPrima)

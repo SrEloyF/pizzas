@@ -230,7 +230,8 @@ def vista_admin_empleados(request):
         'empleados_mas_eficaces': list(empleados_mas_eficaces),
         'ventas_promedio_por_empleado': ventas_promedio_por_empleado,
         'tiempo_promedio_pedido': tiempo_promedio_pedido,
-        'estado_empleados': estado_empleados
+        'estado_empleados': estado_empleados,
+        'meses': json.dumps(meses),
     })
 
 
@@ -263,7 +264,7 @@ def vista_admin_sucursales(request):
     pedidos_promedio_sucursal = Pedido.objects.aggregate(promedio_pedidos=Avg('id_pedido'))['promedio_pedidos'] or 0
 
     return render(request, 'panel_admin/admin_sucursales.html', {
-        'data_ventas_sucursal': data_ventas_sucursal,
+        'data_ventas_sucursal': json.dumps(data_ventas_sucursal),
         'data_clientes_sucursal': data_clientes_sucursal,
         'data_empleados_sucursal': data_empleados_sucursal,
         'ganancias_promedio_sucursal': round(ganancias_promedio_sucursal, 2),
@@ -287,7 +288,7 @@ def vista_admin_pprima(request):
         .values_list('id_proprima__nombre', 'total_vendido')
     )
 
-    prod_prima_mas_vendidos = [(nombre, int(total)) for nombre, total in prod_prima_mas_vendidos]
+    prod_prima_mas_vendidos = [(nombre, int(total or 0)) for nombre, total in prod_prima_mas_vendidos]
 
     prod_prima_menos_vendidos = list(
         Paquete.objects.values('id_proprima__nombre')
@@ -449,7 +450,7 @@ class EmpleadoListView(BaseListView):
 class ProductoVentaListView(BaseListView):
     model = ProductoVenta
     model_name = "ProductosVenta"
-    campos = ['id_proventa', 'id_repertorio', 'estado']
+    campos = ['id_proventa', 'id_repertorio', 'estado', 'codigo']
 
 class ProductoPrimaListView(BaseListView):
     model = ProductoPrima

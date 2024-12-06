@@ -72,8 +72,11 @@
 
 <script>
     const chartDataSucursalesVenta = {{ data_ventas_sucursal|safe }};
+    console.log(chartDataSucursalesVenta);
     const sucursales = chartDataSucursalesVenta.map(item => item[0]);
+    console.log(sucursales);
     const ventas = chartDataSucursalesVenta.map(item => item[1]);
+    console.log(ventas);
     const arreglo_colores = ["#FF6787", "#FFB68C", "#B6D3E2", "#97ED97"];
     const graficoBarras = echarts.init(document.getElementById('graficoBarrasVentasSucursal'));
     const option = {
@@ -97,13 +100,14 @@
             name: 'Ventas'
         },
         series: [{
-            name: 'Ventas',
-            type: 'bar',
+            name: 'Ventas', 
+            type: 'bar', 
             data: ventas,
-            itemStyle: {
-                color: function (params) {
-                    return arreglo_colores[params.dataIndex % arreglo_colores.length];
-                }
+            barMaxWidth: 70,
+            itemStyle: { 
+                color: function (params) { 
+                    return arreglo_colores[params.dataIndex % arreglo_colores.length]; 
+                } 
             }
         }]
     };

@@ -177,6 +177,7 @@ class ProductoVenta(models.Model):
     id_repertorio = models.ForeignKey(Repertorio, db_column='id_repertorio', on_delete= models.PROTECT)
     fecha_estado = models.DateField(auto_now_add=True)
     estado = models.CharField(max_length=45, choices=ESTADO_CHOICE)
+    codigo = models.CharField(max_length=15)
 
     class Meta:
         db_table = 'productos_venta'
