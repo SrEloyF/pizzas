@@ -82,8 +82,6 @@
 <script>
     const chartDataEmpleadosVentas = {{ data_empleados_mas_ventas|safe }};
     const empleadosMasEficaces = {{ empleados_mas_eficaces | safe}};
-    //console.log(empleadosMasEficaces);
-    //console.log(chartDataEmpleadosVentas);
     const chartMeses = {{ meses|safe }};
     const arreglo_colores = ["#FF6787", "#FFB68C", "#B6D3E2", "#97ED97", "#55CBD3", "#D18BC0", "#F9D877", "#FE8E7B", "#C7EEFF", "#6384B3", "#7FBEAF", "#EE9B69"];
 
@@ -161,7 +159,7 @@
                 show: false
             }
         }],
-        color: ['#FFD40D', '#D03139', 'ffffff']
+        color: arreglo_colores
     };
 
     graficoCircular.setOption(optionCircular);

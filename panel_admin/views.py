@@ -16,7 +16,7 @@ from django.contrib.auth import authenticate, login
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models.functions import TruncMonth, TruncDay, TruncHour, Concat, Coalesce
-from django.db.models import Value, Count, Sum, Avg, F, Q, ExpressionWrapper, DurationField
+from django.db.models import Value, Count, Sum, Avg, F, Q, ExpressionWrapper, DurationField, FloatField
 import locale
 
 locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
@@ -201,7 +201,13 @@ def vista_admin_empleados(request):
     ]
     
     # 5. Ventas promedio por empleado
-    ventas_promedio_por_empleado = 2.2  # Está definido para pruebas, déjalo así
+    total_pedidos = Pedido.objects.count()
+    total_repartidores = Empleado.objects.filter(cargo='repartidor').count()
+
+    ventas_promedio_por_empleado = round(
+        total_pedidos / max(total_repartidores, 1), 
+        2
+    )
 
     # 6. Tiempo promedio entre pedidos.fecha_pedido y pedidos.fecha_entrega en horas
     tiempo_promedio_pedido = (
@@ -281,14 +287,7 @@ def vista_admin_pprima(request):
         promedio_precio=Avg('precio')
     )['promedio_precio'] or 0
 
-    prod_prima_mas_vendidos = list(
-        Paquete.objects.values('id_proprima__nombre')
-        .annotate(total_vendido=Sum('id_proventa__detallepedido'))
-        .order_by('-total_vendido')[:4]
-        .values_list('id_proprima__nombre', 'total_vendido')
-    )
-
-    prod_prima_mas_vendidos = [(nombre, int(total or 0)) for nombre, total in prod_prima_mas_vendidos]
+    prod_prima_mas_vendidos = list( ProductoPrima.objects .annotate(total_cantidad=Sum('paquete__cantidad')) .values('nombre', 'total_cantidad') .order_by('-total_cantidad') .values_list('nombre', 'total_cantidad')[:8] )
 
     prod_prima_menos_vendidos = list(
         Paquete.objects.values('id_proprima__nombre')
@@ -302,7 +301,7 @@ def vista_admin_pprima(request):
     prod_prima_bajo_stock = list(
         ProductoPrima.objects.values('nombre')
         .annotate(stock_actual=Sum('stock'))
-        .order_by('stock_actual')[:4]
+        .order_by('stock_actual')[:8]
         .values_list('nombre', 'stock_actual')
     )
 
